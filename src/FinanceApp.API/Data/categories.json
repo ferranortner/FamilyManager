@@ -1,0 +1,85 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "N\u00F2mina",
+      "type": "income",
+      "color": "#10b981",
+      "icon": "\uD83D\uDCB0",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6660572Z"
+    },
+    {
+      "id": 2,
+      "name": "Freelance",
+      "type": "income",
+      "color": "#34d399",
+      "icon": "\uD83D\uDCBB",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6662935Z"
+    },
+    {
+      "id": 3,
+      "name": "Compres",
+      "type": "expense",
+      "color": "#f59e0b",
+      "icon": "\uD83D\uDED2",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6662939Z"
+    },
+    {
+      "id": 4,
+      "name": "Transport",
+      "type": "expense",
+      "color": "#3b82f6",
+      "icon": "\uD83D\uDE97",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.666294Z"
+    },
+    {
+      "id": 5,
+      "name": "Menjar",
+      "type": "expense",
+      "color": "#ef4444",
+      "icon": "\uD83C\uDF54",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6662942Z"
+    },
+    {
+      "id": 6,
+      "name": "Serveis",
+      "type": "expense",
+      "color": "#8b5cf6",
+      "icon": "\uD83D\uDCA1",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6662954Z"
+    },
+    {
+      "id": 7,
+      "name": "Oci",
+      "type": "expense",
+      "color": "#ec4899",
+      "icon": "\uD83C\uDFAE",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6662956Z"
+    },
+    {
+      "id": 8,
+      "name": "Salut",
+      "type": "expense",
+      "color": "#14b8a6",
+      "icon": "\u2695\uFE0F",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:48:14.6662957Z"
+    },
+    {
+      "id": 9,
+      "name": "Natzaret Esplugues Ivan",
+      "type": "expense",
+      "color": "#dd3636",
+      "icon": "",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:49:03.9134064Z"
+    }
+  ]
+}

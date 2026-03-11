@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+     <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Incluir archivos estáticos -->
+    <None Update="**\*.html;**\*.css;**\*.js" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

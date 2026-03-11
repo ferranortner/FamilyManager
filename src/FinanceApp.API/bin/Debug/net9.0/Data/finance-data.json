@@ -1,0 +1,16 @@
+{
+  "accounts": [],
+  "transactions": [],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Salut",
+      "type": "expense",
+      "color": "#14b8a6",
+      "icon": "\u2695\uFE0F",
+      "isActive": true,
+      "createdAt": "2026-03-10T16:23:40.3409812Z"
+    }
+  ],
+  "budgets": []
+}
