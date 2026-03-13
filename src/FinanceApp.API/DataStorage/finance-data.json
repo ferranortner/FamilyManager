@@ -1,0 +1,136 @@
+{
+  "accounts": [],
+  "transactions": [
+    {
+      "id": 3,
+      "accountId": 1,
+      "categoryId": 2,
+      "amount": 10,
+      "description": "bizum",
+      "date": "2026-03-11T00:00:00",
+      "type": "income",
+      "createdAt": "2026-03-12T16:30:51.3656476Z"
+    },
+    {
+      "id": 5,
+      "accountId": 1,
+      "categoryId": 13,
+      "amount": 89.78,
+      "description": "Col\u00B7legi N\u00FAria",
+      "date": "2025-01-13T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T11:55:48.7992501Z"
+    },
+    {
+      "id": 6,
+      "accountId": 1,
+      "categoryId": 10,
+      "amount": 81.6,
+      "description": "Col\u00B7legi Xavier",
+      "date": "2025-01-13T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T11:56:27.2744868Z"
+    },
+    {
+      "id": 7,
+      "accountId": 1,
+      "categoryId": 9,
+      "amount": 609.7,
+      "description": "Col\u00B7legi Iv\u00E0n",
+      "date": "2025-01-13T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T11:57:11.5181345Z"
+    },
+    {
+      "id": 8,
+      "accountId": 1,
+      "categoryId": 14,
+      "amount": 54.6,
+      "description": "Sina\u00ED",
+      "date": "2025-01-12T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:04:31.1908679Z"
+    },
+    {
+      "id": 9,
+      "accountId": 1,
+      "categoryId": 14,
+      "amount": 51.83,
+      "description": "Kith",
+      "date": "2025-01-12T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:05:09.6222818Z"
+    },
+    {
+      "id": 10,
+      "accountId": 1,
+      "categoryId": 15,
+      "amount": 1000,
+      "description": "Part 1",
+      "date": "2026-03-01T00:00:00",
+      "type": "income",
+      "createdAt": "2026-03-13T12:26:08.6613733Z"
+    },
+    {
+      "id": 11,
+      "accountId": 1,
+      "categoryId": 16,
+      "amount": 1000,
+      "description": "Part 2",
+      "date": "2026-03-01T00:00:00",
+      "type": "income",
+      "createdAt": "2026-03-13T12:26:32.5866412Z"
+    },
+    {
+      "id": 12,
+      "accountId": 1,
+      "categoryId": 13,
+      "amount": 96.18,
+      "description": "Col\u00B7legi N\u00FAria",
+      "date": "2026-03-09T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:27:32.4585627Z"
+    },
+    {
+      "id": 13,
+      "accountId": 1,
+      "categoryId": 10,
+      "amount": 147,
+      "description": "Col\u00B7legi Xavier",
+      "date": "2026-03-09T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:27:53.0291097Z"
+    },
+    {
+      "id": 14,
+      "accountId": 1,
+      "categoryId": 9,
+      "amount": 337.6,
+      "description": "Col\u00B7legi Iv\u00E0n",
+      "date": "2026-03-09T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:28:13.9986448Z"
+    },
+    {
+      "id": 15,
+      "accountId": 1,
+      "categoryId": 14,
+      "amount": 60,
+      "description": "Sina\u00ED",
+      "date": "2026-03-09T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:28:34.4067583Z"
+    },
+    {
+      "id": 16,
+      "accountId": 1,
+      "categoryId": 18,
+      "amount": 1176,
+      "description": "Lloger",
+      "date": "2026-03-02T00:00:00",
+      "type": "expense",
+      "createdAt": "2026-03-13T12:31:34.9702477Z"
+    }
+  ],
+  "budgets": []
+}

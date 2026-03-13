@@ -1,16 +1,17 @@
 {
   "accounts": [],
-  "transactions": [],
-  "categories": [
+  "transactions": [
     {
       "id": 1,
-      "name": "Salut",
+      "accountId": 1,
+      "categoryId": 7,
+      "amount": 454,
+      "description": "Roboci\u00E8ncia",
+      "date": "2026-03-10T00:00:00",
       "type": "expense",
-      "color": "#14b8a6",
-      "icon": "\u2695\uFE0F",
-      "isActive": true,
-      "createdAt": "2026-03-10T16:23:40.3409812Z"
+      "createdAt": "2026-03-10T17:24:16.9310745Z"
     }
   ],
+  "categories": [],
   "budgets": []
 }

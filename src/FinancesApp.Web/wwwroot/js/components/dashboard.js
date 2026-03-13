@@ -11,6 +11,8 @@ export class Dashboard {
     this.financeService = financeServiceInstance || (typeof financeService !== 'undefined' ? financeService : null)
     this.currentDate = new Date()
     this.chart = null
+    this.transactions = [] // Emmagatzemar transaccions
+    this.selectedDay = null // Dia seleccionat
 
     console.log('Dashboard inicialitzat:', {
       container: this.container,
@@ -35,8 +37,12 @@ export class Dashboard {
       const summary = await this.financeService.getSummary(year, month)
       console.log('Summary rebut:', summary) // DEBUG
 
-      const dailyData = await this.getDailyData(year, month)
-      console.log('DailyData rebut:', dailyData) // DEBUG
+      // Obtenir transaccions del mes
+      this.transactions = await this.getTransactions(year, month)
+      console.log('Transaccions rebudes:', this.transactions) // DEBUG
+
+      const dailyData = this.calculateDailyData(this.transactions)
+      console.log('DailyData calculat:', dailyData) // DEBUG
 
       // Generar HTML
       const html = this.generateHTML(summary, dailyData)
@@ -80,70 +86,90 @@ export class Dashboard {
           <div class="amount negative">${this.formatCurrency(summary.totalExpenses)}</div>
         </div>
       </div>
-      
-      <div class="card calendar-card">
-        <div class="calendar-header">
-          <button id="prev-month" class="nav-btn">‹</button>
-          <h3 id="current-month">${this.getMonthYearString()}</h3>
-          <button id="next-month" class="nav-btn">›</button>
+
+      <div class="dashboard-content">
+        <div class="card calendar-card">
+          <div class="calendar-header">
+            <button id="prev-month" class="nav-btn">‹</button>
+            <h3 id="current-month">${this.getMonthYearString()}</h3>
+            <button id="next-month" class="nav-btn">›</button>
+          </div>
+          <div class="calendar-grid" id="calendar">
+            ${this.generateCalendarHTML(dailyData)}
+          </div>
         </div>
-        <div class="calendar-grid" id="calendar">
-          ${this.generateCalendarHTML(dailyData)}
+
+        <div class="card transactions-card" id="transactions-panel">
+          <div class="transactions-panel-header">
+            <h3 id="selected-date-title">Transaccions del mes</h3>
+            <button id="close-transactions" class="btn-close-panel">✕</button>
+          </div>
+          <div id="transactions-list" class="transactions-list">
+            ${this.renderTransactionsList(this.transactions)}
+          </div>
         </div>
       </div>
-      
+
       <div class="card chart-card">
         <canvas id="chart"></canvas>
       </div>
     `
   }
 
-  async getDailyData(year, month) {
+  async getTransactions(year, month) {
     try {
       if (!this.financeService?.getTransactionsByMonth) {
-        console.warn('getTransactionsByMonth no disponible')
-        return {}
-      }
-
-      const transactions = await this.financeService.getTransactionsByMonth(year, month)
-      console.log(`${transactions?.length || 0} transaccions trobades`) // DEBUG
-
-      if (!Array.isArray(transactions)) {
-        console.warn('Les transaccions no són un array:', transactions)
-        return {}
-      }
-
-      const dailyData = {}
-
-      transactions.forEach((t, index) => {
-        try {
+        console.warn('getTransactionsByMonth no disponible, provant getTransactions...')
+        // Fallback: obtenir totes les transaccions i filtrar
+        const allTransactions = await this.financeService.getTransactions()
+        return allTransactions.filter(t => {
           const date = new Date(t.date)
-          if (isNaN(date.getTime())) {
-            console.warn(`Data invàlida a transacció ${index}:`, t)
-            return
-          }
+          return date.getFullYear() === year && date.getMonth() + 1 === month
+        })
+      }
 
-          const day = date.getDate()
-
-          if (!dailyData[day]) {
-            dailyData[day] = { income: 0, expense: 0 }
-          }
-
-          if (t.type === 'income') {
-            dailyData[day].income += Number(t.amount) || 0
-          } else if (t.type === 'expense') {
-            dailyData[day].expense += Number(t.amount) || 0
-          }
-        } catch (err) {
-          console.error(`Error processant transacció ${index}:`, t, err)
-        }
-      })
-
-      return dailyData
+      return await this.financeService.getTransactionsByMonth(year, month)
     } catch (error) {
-      console.error('Error a getDailyData:', error)
+      console.error('Error obtenint transaccions:', error)
+      return []
+    }
+  }
+
+  calculateDailyData(transactions) {
+    const dailyData = {}
+
+    if (!Array.isArray(transactions)) {
+      console.warn('Les transaccions no són un array:', transactions)
       return {}
     }
+
+    transactions.forEach((t, index) => {
+      try {
+        const date = new Date(t.date)
+        if (isNaN(date.getTime())) {
+          console.warn(`Data invàlida a transacció ${index}:`, t)
+          return
+        }
+
+        const day = date.getDate()
+
+        if (!dailyData[day]) {
+          dailyData[day] = { income: 0, expense: 0, transactions: [] }
+        }
+
+        if (t.type === 'income') {
+          dailyData[day].income += Number(t.amount) || 0
+        } else if (t.type === 'expense') {
+          dailyData[day].expense += Number(t.amount) || 0
+        }
+
+        dailyData[day].transactions.push(t)
+      } catch (err) {
+        console.error(`Error processant transacció ${index}:`, t, err)
+      }
+    })
+
+    return dailyData
   }
 
   getMonthYearString() {
@@ -174,16 +200,25 @@ export class Dashboard {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year
+      const isSelected = this.selectedDay === day
 
-      const data = dailyData[day] || { income: 0, expense: 0 }
+      const data = dailyData[day] || { income: 0, expense: 0, transactions: [] }
       const hasIncome = data.income > 0
       const hasExpense = data.expense > 0
+      const hasTransactions = data.transactions.length > 0
 
       html += `
-        <div class="day-cell ${isToday ? 'today' : ''}" data-day="${day}">
+        <div class="day-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasTransactions ? 'has-transactions' : ''}" 
+             data-day="${day}">
           <div class="day-number">${day}</div>
-          ${hasIncome ? `<div class="day-income">+${this.formatCurrency(data.income, true)}</div>` : ''}
-          ${hasExpense ? `<div class="day-expense">-${this.formatCurrency(data.expense, true)}</div>` : ''}
+          <div class="day-indicators">
+            ${hasIncome ? `<div class="indicator income" title="Ingressos: ${this.formatCurrency(data.income)}"></div>` : ''}
+            ${hasExpense ? `<div class="indicator expense" title="Despeses: ${this.formatCurrency(data.expense)}"></div>` : ''}
+          </div>
+          <div class="day-amounts">
+            ${hasIncome ? `<div class="day-income">+${this.formatCurrency(data.income, true)}</div>` : ''}
+            ${hasExpense ? `<div class="day-expense">-${this.formatCurrency(data.expense, true)}</div>` : ''}
+          </div>
         </div>
       `
     }
@@ -192,16 +227,108 @@ export class Dashboard {
     return html
   }
 
+  renderTransactionsList(transactions, day = null) {
+    let filteredTransactions = transactions
+
+    if (day !== null) {
+      filteredTransactions = transactions.filter(t => {
+        const date = new Date(t.date)
+        return date.getDate() === day
+      })
+    }
+
+    if (filteredTransactions.length === 0) {
+      return `
+        <div class="empty-state">
+          <p>${day ? 'No hi ha transaccions aquest dia' : 'No hi ha transaccions aquest mes'}</p>
+        </div>
+      `
+    }
+
+    // Ordenar per data (més recent primer)
+    const sorted = [...filteredTransactions].sort((a, b) => new Date(b.date) - new Date(a.date))
+
+    return sorted
+      .map(t => {
+        const isIncome = t.type === 'income'
+        const date = new Date(t.date)
+        const timeStr = date.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })
+
+        return `
+        <div class="transaction-item ${isIncome ? 'income' : 'expense'}">
+          <div class="transaction-info">
+            <div class="transaction-icon">${isIncome ? '📈' : '📉'}</div>
+            <div class="transaction-details">
+              <span class="transaction-description">${t.description || 'Sense descripció'}</span>
+              <span class="transaction-time">${timeStr}</span>
+            </div>
+          </div>
+          <div class="transaction-amount ${isIncome ? 'positive' : 'negative'}">
+            ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(t.amount))}
+          </div>
+        </div>
+      `
+      })
+      .join('')
+  }
+
   attachCalendarEvents() {
+    // Navegació del calendari
     document.getElementById('prev-month')?.addEventListener('click', () => {
       this.currentDate.setMonth(this.currentDate.getMonth() - 1)
+      this.selectedDay = null
       this.render()
     })
 
     document.getElementById('next-month')?.addEventListener('click', () => {
       this.currentDate.setMonth(this.currentDate.getMonth() + 1)
+      this.selectedDay = null
       this.render()
     })
+
+    // Clic en dia del calendari
+    document.querySelectorAll('.day-cell[data-day]').forEach(cell => {
+      cell.addEventListener('click', e => {
+        const day = parseInt(e.currentTarget.dataset.day)
+        this.selectDay(day)
+      })
+    })
+
+    // Tancar panell de transaccions
+    document.getElementById('close-transactions')?.addEventListener('click', () => {
+      this.selectedDay = null
+      this.updateTransactionsPanel()
+      document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'))
+    })
+  }
+
+  selectDay(day) {
+    this.selectedDay = day
+
+    // Actualitzar selecció visual
+    document.querySelectorAll('.day-cell').forEach(cell => {
+      cell.classList.remove('selected')
+      if (parseInt(cell.dataset.day) === day) {
+        cell.classList.add('selected')
+      }
+    })
+
+    // Actualitzar panell de transaccions
+    this.updateTransactionsPanel()
+  }
+
+  updateTransactionsPanel() {
+    const title = document.getElementById('selected-date-title')
+    const list = document.getElementById('transactions-list')
+
+    if (this.selectedDay) {
+      const dateStr = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.selectedDay).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })
+      title.textContent = `Transaccions - ${dateStr}`
+      list.innerHTML = this.renderTransactionsList(this.transactions, this.selectedDay)
+    } else {
+      title.textContent = 'Transaccions del mes'
+      list.innerHTML = this.renderTransactionsList(this.transactions)
+    }
   }
 
   formatCurrency(amount, compact = false) {

@@ -6,6 +6,9 @@ export class TransactionManager {
   constructor(containerId) {
     this.container = document.getElementById(containerId)
     this.categories = []
+    this.transactions = []
+    this.sortField = 'date' // 'date' o 'amount'
+    this.sortDirection = 'desc' // 'asc' o 'desc'
   }
 
   async render() {
@@ -27,7 +30,20 @@ export class TransactionManager {
         <h2>Transaccions</h2>
         <button class="btn btn-primary" id="add-btn">+ Nova Transacció</button>
       </div>
-      
+
+      <div class="transactions-controls">
+        <div class="sort-controls">
+          <label>Ordenar per:</label>
+          <select id="sort-field">
+            <option value="date" selected>Data</option>
+            <option value="amount">Import</option>
+          </select>
+          <button id="sort-direction" class="btn-sort" title="Canviar direcció">
+            <span id="sort-icon">↓</span>
+          </button>
+        </div>
+      </div>
+
       <div id="transactions-list" class="transactions-list">
         <p class="loading">Carregant transaccions...</p>
       </div>
@@ -35,6 +51,18 @@ export class TransactionManager {
 
     // Event listener per afegir nova transacció
     document.getElementById('add-btn').addEventListener('click', () => this.openModal())
+
+    // Event listeners per ordenació
+    document.getElementById('sort-field').addEventListener('change', e => {
+      this.sortField = e.target.value
+      this.renderSortedTransactions()
+    })
+
+    document.getElementById('sort-direction').addEventListener('click', () => {
+      this.sortDirection = this.sortDirection === 'desc' ? 'asc' : 'desc'
+      document.getElementById('sort-icon').textContent = this.sortDirection === 'desc' ? '↓' : '↑'
+      this.renderSortedTransactions()
+    })
 
     // Carregar transaccions
     await this.loadTransactions()
@@ -45,10 +73,10 @@ export class TransactionManager {
 
     try {
       console.log('Carregant transaccions...')
-      const transactions = await financeService.getTransactions()
-      console.log('Transaccions rebudes:', transactions)
+      this.transactions = await financeService.getTransactions()
+      console.log('Transaccions rebudes:', this.transactions)
 
-      if (!transactions || transactions.length === 0) {
+      if (!this.transactions || this.transactions.length === 0) {
         listContainer.innerHTML = `
           <div class="empty-state">
             <p>No hi ha transaccions</p>
@@ -58,19 +86,7 @@ export class TransactionManager {
         return
       }
 
-      // Ordenar per data (més recent primer)
-      const sortedTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date))
-
-      listContainer.innerHTML = sortedTransactions.map(t => this.renderTransactionItem(t)).join('')
-
-      // Afegir event listeners per esborrar
-      listContainer.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation()
-          const id = e.target.closest('.btn-delete').dataset.id
-          this.deleteTransaction(id)
-        })
-      })
+      this.renderSortedTransactions()
     } catch (err) {
       console.error('Error carregant transaccions:', err)
       listContainer.innerHTML = `
@@ -80,6 +96,40 @@ export class TransactionManager {
         </div>
       `
     }
+  }
+
+  sortTransactions() {
+    const sorted = [...this.transactions]
+
+    sorted.sort((a, b) => {
+      let comparison = 0
+
+      if (this.sortField === 'date') {
+        comparison = new Date(a.date) - new Date(b.date)
+      } else if (this.sortField === 'amount') {
+        comparison = a.amount - b.amount
+      }
+
+      return this.sortDirection === 'desc' ? -comparison : comparison
+    })
+
+    return sorted
+  }
+
+  renderSortedTransactions() {
+    const listContainer = document.getElementById('transactions-list')
+    const sortedTransactions = this.sortTransactions()
+
+    listContainer.innerHTML = sortedTransactions.map(t => this.renderTransactionItem(t)).join('')
+
+    // Afegir event listeners per esborrar
+    listContainer.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation()
+        const id = e.target.closest('.btn-delete').dataset.id
+        this.deleteTransaction(id)
+      })
+    })
   }
 
   renderTransactionItem(t) {
@@ -125,7 +175,8 @@ export class TransactionManager {
     try {
       await financeService.deleteTransaction(id)
       console.log('Transacció eliminada:', id)
-      await this.loadTransactions() // Recarregar llista
+      this.transactions = this.transactions.filter(t => t.id !== id)
+      this.renderSortedTransactions()
     } catch (err) {
       console.error('Error eliminant transacció:', err)
       alert('Error eliminant la transacció: ' + err.message)
@@ -150,28 +201,28 @@ export class TransactionManager {
           <h3>Nova Transacció</h3>
           <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
         </div>
-        
+
         <form id="transaction-form">
           <div class="form-group">
             <label for="description">Descripció *</label>
             <input type="text" id="description" name="description" required 
                    placeholder="Ex: Compra al supermercat">
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="amount">Import (€) *</label>
               <input type="number" id="amount" name="amount" step="0.01" min="0.01" required 
                      placeholder="0.00">
             </div>
-            
+
             <div class="form-group">
               <label for="date">Data *</label>
               <input type="date" id="date" name="date" 
                      value="${new Date().toISOString().split('T')[0]}" required>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="type">Tipus *</label>
@@ -180,7 +231,7 @@ export class TransactionManager {
                 <option value="income">Ingrés</option>
               </select>
             </div>
-            
+
             <div class="form-group">
               <label for="categoryId">Categoria *</label>
               <select id="categoryId" name="categoryId" required>
@@ -191,7 +242,7 @@ export class TransactionManager {
           </div>
 
           <input type="hidden" name="accountId" value="1">
-          
+
           <div class="modal-actions">
             <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
               Cancel·lar
@@ -235,10 +286,11 @@ export class TransactionManager {
       console.log('Creant transacció:', data)
 
       try {
-        await financeService.addTransaction(data)
+        const newTransaction = await financeService.addTransaction(data)
         console.log('Transacció creada correctament')
         modal.remove()
-        await this.loadTransactions() // Recarregar llista
+        this.transactions.unshift(newTransaction)
+        this.renderSortedTransactions()
       } catch (err) {
         console.error('Error creant transacció:', err)
         alert('Error guardant la transacció: ' + err.message)

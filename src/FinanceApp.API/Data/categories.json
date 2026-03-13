@@ -15,7 +15,7 @@
       "type": "income",
       "color": "#34d399",
       "icon": "\uD83D\uDCBB",
-      "isActive": true,
+      "isActive": false,
       "createdAt": "2026-03-10T16:48:14.6662935Z"
     },
     {
@@ -77,9 +77,90 @@
       "name": "Natzaret Esplugues Ivan",
       "type": "expense",
       "color": "#dd3636",
-      "icon": "",
+      "icon": "\uD83C\uDF93",
       "isActive": true,
       "createdAt": "2026-03-10T16:49:03.9134064Z"
+    },
+    {
+      "id": 10,
+      "name": "Natzaret Esplugues Xavier",
+      "type": "expense",
+      "color": "#6b7280",
+      "icon": "\uD83C\uDF93",
+      "isActive": true,
+      "createdAt": "2026-03-11T13:50:27.4145284Z"
+    },
+    {
+      "id": 11,
+      "name": "Bizum",
+      "type": "expense",
+      "color": "#8284ba",
+      "icon": "",
+      "isActive": true,
+      "createdAt": "2026-03-12T16:34:09.9593006Z"
+    },
+    {
+      "id": 12,
+      "name": "Bizum",
+      "type": "income",
+      "color": "#b4eeca",
+      "icon": null,
+      "isActive": true,
+      "createdAt": "2026-03-12T17:07:16.6487019Z"
+    },
+    {
+      "id": 13,
+      "name": "Natzaret Esplugues N\u00FAria",
+      "type": "expense",
+      "color": "#d2df72",
+      "icon": "\uD83C\uDF93",
+      "isActive": true,
+      "createdAt": "2026-03-13T11:54:55.3245078Z"
+    },
+    {
+      "id": 14,
+      "name": "Col\u00B7legi",
+      "type": "expense",
+      "color": "#0a58f5",
+      "icon": "\uD83D\uDCBB",
+      "isActive": true,
+      "createdAt": "2026-03-13T12:03:55.698848Z"
+    },
+    {
+      "id": 15,
+      "name": "Part 1",
+      "type": "income",
+      "color": "#c8f8bf",
+      "icon": "\uD83D\uDCB5",
+      "isActive": true,
+      "createdAt": "2026-03-13T12:22:49.5725667Z"
+    },
+    {
+      "id": 16,
+      "name": "Part 2",
+      "type": "income",
+      "color": "#c1f0c2",
+      "icon": "\uD83D\uDCB5",
+      "isActive": true,
+      "createdAt": "2026-03-13T12:23:18.3092474Z"
+    },
+    {
+      "id": 17,
+      "name": "Part 3",
+      "type": "income",
+      "color": "#bdf3ba",
+      "icon": "\uD83D\uDCB5",
+      "isActive": true,
+      "createdAt": "2026-03-13T12:24:38.6233597Z"
+    },
+    {
+      "id": 18,
+      "name": "Lloger",
+      "type": "expense",
+      "color": "#8d2a2a",
+      "icon": "\uD83C\uDFE0",
+      "isActive": true,
+      "createdAt": "2026-03-13T12:31:05.9156809Z"
     }
   ]
 }

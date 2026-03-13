@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "6DQrXG1/nME=",
+  "dgSpecHash": "/aiOSLSxkvU=",
   "success": true,
   "projectFilePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.Core\\Models\\FinanceApp.Core.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.24\\microsoft.netcore.app.ref.8.0.24.nupkg.sha512",
-    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.24\\microsoft.windowsdesktop.app.ref.8.0.24.nupkg.sha512",
-    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.24\\microsoft.aspnetcore.app.ref.8.0.24.nupkg.sha512"
+    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.25\\microsoft.netcore.app.ref.8.0.25.nupkg.sha512",
+    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.25\\microsoft.windowsdesktop.app.ref.8.0.25.nupkg.sha512",
+    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.25\\microsoft.aspnetcore.app.ref.8.0.25.nupkg.sha512"
   ],
   "logs": []
 }
