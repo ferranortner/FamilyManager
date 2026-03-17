@@ -3,7 +3,6 @@ export class Dashboard {
   constructor(containerId, financeServiceInstance = null) {
     this.container = document.getElementById(containerId)
 
-    // Verifica IMMEDIATAMENT si el contenidor existeix
     if (!this.container) {
       throw new Error(`No s'ha trobat el contenidor amb id="${containerId}"`)
     }
@@ -11,8 +10,8 @@ export class Dashboard {
     this.financeService = financeServiceInstance || (typeof financeService !== 'undefined' ? financeService : null)
     this.currentDate = new Date()
     this.chart = null
-    this.transactions = [] // Emmagatzemar transaccions
-    this.selectedDay = null // Dia seleccionat
+    this.transactions = []
+    this.selectedDay = null
 
     console.log('Dashboard inicialitzat:', {
       container: this.container,
@@ -26,36 +25,34 @@ export class Dashboard {
         throw new Error('financeService no está disponible')
       }
 
-      console.log('Iniciant render...') // DEBUG
+      console.log('Iniciant render...')
 
-      // Obtenir dades
       const year = this.currentDate.getFullYear()
       const month = this.currentDate.getMonth() + 1
 
-      console.log(`Sol·licitant dades per ${year}-${month}`) // DEBUG
-
-      const summary = await this.financeService.getSummary(year, month)
-      console.log('Summary rebut:', summary) // DEBUG
+      console.log(`Sol·licitant dades per ${year}-${month}`)
 
       // Obtenir transaccions del mes
       this.transactions = await this.getTransactions(year, month)
-      console.log('Transaccions rebudes:', this.transactions) // DEBUG
+      console.log('Transaccions rebudes:', this.transactions)
+
+      // ✅ Recalcular summary amb percentatges aplicats
+      const summary = this.calculateSummaryWithPercentages(this.transactions)
+      console.log('Summary calculat amb percentatges:', summary)
 
       const dailyData = this.calculateDailyData(this.transactions)
-      console.log('DailyData calculat:', dailyData) // DEBUG
+      console.log('DailyData calculat:', dailyData)
 
-      // Generar HTML
       const html = this.generateHTML(summary, dailyData)
-      console.log('HTML generat, inserint al DOM...') // DEBUG
+      console.log('HTML generat, inserint al DOM...')
 
       this.container.innerHTML = html
-      console.log('HTML inserit') // DEBUG
+      console.log('HTML inserit')
 
-      // Adjuntar events i gràfica
       this.attachCalendarEvents()
       this.renderChart(summary)
 
-      console.log('Render completat') // DEBUG
+      console.log('Render completat')
     } catch (error) {
       console.error('Error renderitzant dashboard:', error)
       this.container.innerHTML = `
@@ -65,6 +62,34 @@ export class Dashboard {
           <pre style="background: #f5f5f5; padding: 10px; overflow: auto;">${error.stack}</pre>
         </div>
       `
+    }
+  }
+
+  // ✅ NOU: Calcular summary tenint en compte els percentatges de comptabilització
+  calculateSummaryWithPercentages(transactions) {
+    let totalIncome = 0
+    let totalExpenses = 0
+
+    if (!Array.isArray(transactions)) {
+      console.warn('Transactions no és un array:', transactions)
+      return { totalIncome: 0, totalExpenses: 0, balance: 0 }
+    }
+
+    transactions.forEach(t => {
+      const percentage = t.accountingPercentage || 100
+      const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
+
+      if (t.type === 'income') {
+        totalIncome += effectiveAmount
+      } else if (t.type === 'expense') {
+        totalExpenses += effectiveAmount
+      }
+    })
+
+    return {
+      totalIncome,
+      totalExpenses,
+      balance: totalIncome - totalExpenses,
     }
   }
 
@@ -120,7 +145,6 @@ export class Dashboard {
     try {
       if (!this.financeService?.getTransactionsByMonth) {
         console.warn('getTransactionsByMonth no disponible, provant getTransactions...')
-        // Fallback: obtenir totes les transaccions i filtrar
         const allTransactions = await this.financeService.getTransactions()
         return allTransactions.filter(t => {
           const date = new Date(t.date)
@@ -157,13 +181,20 @@ export class Dashboard {
           dailyData[day] = { income: 0, expense: 0, transactions: [] }
         }
 
+        // ✅ Aplicar percentatge de comptabilització
+        const percentage = t.accountingPercentage || 100
+        const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
+
         if (t.type === 'income') {
-          dailyData[day].income += Number(t.amount) || 0
+          dailyData[day].income += effectiveAmount
         } else if (t.type === 'expense') {
-          dailyData[day].expense += Number(t.amount) || 0
+          dailyData[day].expense += effectiveAmount
         }
 
-        dailyData[day].transactions.push(t)
+        dailyData[day].transactions.push({
+          ...t,
+          effectiveAmount,
+        })
       } catch (err) {
         console.error(`Error processant transacció ${index}:`, t, err)
       }
@@ -245,7 +276,6 @@ export class Dashboard {
       `
     }
 
-    // Ordenar per data (més recent primer)
     const sorted = [...filteredTransactions].sort((a, b) => new Date(b.date) - new Date(a.date))
 
     return sorted
@@ -254,26 +284,34 @@ export class Dashboard {
         const date = new Date(t.date)
         const timeStr = date.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })
 
+        // ✅ Calcular import efectiu
+        const percentage = t.accountingPercentage || 100
+        const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
+        const hasPartialAccounting = percentage !== 100
+
         return `
-        <div class="transaction-item ${isIncome ? 'income' : 'expense'}">
-          <div class="transaction-info">
-            <div class="transaction-icon">${isIncome ? '📈' : '📉'}</div>
-            <div class="transaction-details">
-              <span class="transaction-description">${t.description || 'Sense descripció'}</span>
-              <span class="transaction-time">${timeStr}</span>
+          <div class="transaction-item ${isIncome ? 'income' : 'expense'} ${hasPartialAccounting ? 'partial' : ''}">
+            <div class="transaction-info">
+              <div class="transaction-icon">${isIncome ? '📈' : '📉'}</div>
+              <div class="transaction-details">
+                <span class="transaction-description">${t.description || 'Sense descripció'}</span>
+                <span class="transaction-time">${timeStr}</span>
+                ${hasPartialAccounting ? `<span class="percentage-badge">${percentage}%</span>` : ''}
+              </div>
+            </div>
+            <div class="transaction-amounts">
+              <div class="transaction-amount ${isIncome ? 'positive' : 'negative'}">
+                ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(effectiveAmount))}
+              </div>
+              ${hasPartialAccounting ? `<div class="original-amount">(${this.formatCurrency(t.amount)} total)</div>` : ''}
             </div>
           </div>
-          <div class="transaction-amount ${isIncome ? 'positive' : 'negative'}">
-            ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(t.amount))}
-          </div>
-        </div>
-      `
+        `
       })
       .join('')
   }
 
   attachCalendarEvents() {
-    // Navegació del calendari
     document.getElementById('prev-month')?.addEventListener('click', () => {
       this.currentDate.setMonth(this.currentDate.getMonth() - 1)
       this.selectedDay = null
@@ -286,7 +324,6 @@ export class Dashboard {
       this.render()
     })
 
-    // Clic en dia del calendari
     document.querySelectorAll('.day-cell[data-day]').forEach(cell => {
       cell.addEventListener('click', e => {
         const day = parseInt(e.currentTarget.dataset.day)
@@ -294,7 +331,6 @@ export class Dashboard {
       })
     })
 
-    // Tancar panell de transaccions
     document.getElementById('close-transactions')?.addEventListener('click', () => {
       this.selectedDay = null
       this.updateTransactionsPanel()
@@ -305,7 +341,6 @@ export class Dashboard {
   selectDay(day) {
     this.selectedDay = day
 
-    // Actualitzar selecció visual
     document.querySelectorAll('.day-cell').forEach(cell => {
       cell.classList.remove('selected')
       if (parseInt(cell.dataset.day) === day) {
@@ -313,7 +348,6 @@ export class Dashboard {
       }
     })
 
-    // Actualitzar panell de transaccions
     this.updateTransactionsPanel()
   }
 
