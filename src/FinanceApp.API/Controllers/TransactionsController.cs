@@ -19,41 +19,6 @@ namespace FinanceApp.API.Controllers
             _categoriesDataStore = categoriesDataStore;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetAll(
-            [FromQuery] int? year = null,
-            [FromQuery] int? month = null)
-        {
-            var data = await _dataStore.GetDataAsync();
-            var categories = await _categoriesDataStore.GetAllAsync();  // ← CARREGAR CATEGORIES
-
-            var transactions = data.Transactions.AsEnumerable();
-
-            if (year.HasValue)
-                transactions = transactions.Where(t => t.Date.Year == year.Value);
-
-            if (month.HasValue)
-                transactions = transactions.Where(t => t.Date.Month == month.Value);
-
-            // MAPEAR a DTO amb categoria resolta
-            var result = transactions
-                .OrderByDescending(t => t.Date)
-                .Select(t => new TransactionDto
-                {
-                    Id = t.Id,
-                    AccountId = t.AccountId,
-                    CategoryId = t.CategoryId,
-                    Category = categories.FirstOrDefault(c => c.Id == t.CategoryId), // ← RESOLDRE FK
-                    Amount = t.Amount,
-                    Description = t.Description,
-                    Date = t.Date,
-                    Type = t.Type,
-                    CreatedAt = t.CreatedAt
-                });
-
-            return Ok(result);
-        }
-
         [HttpGet("summary")]
         public async Task<ActionResult<object>> GetSummary([FromQuery] int year, [FromQuery] int month)
         {
@@ -72,10 +37,46 @@ namespace FinanceApp.API.Controllers
             });
         }
 
+        // Controllers/TransactionsController.cs
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetAll(
+            [FromQuery] int? year = null,
+            [FromQuery] int? month = null)
+        {
+            var data = await _dataStore.GetDataAsync();
+            var categories = await _categoriesDataStore.GetAllAsync();
+
+            var transactions = data.Transactions.AsEnumerable();
+
+            if (year.HasValue)
+                transactions = transactions.Where(t => t.Date.Year == year.Value);
+
+            if (month.HasValue)
+                transactions = transactions.Where(t => t.Date.Month == month.Value);
+
+            var result = transactions
+                .OrderByDescending(t => t.Date)
+                .Select(t => new TransactionDto
+                {
+                    Id = t.Id,
+                    AccountId = t.AccountId,
+                    CategoryId = t.CategoryId,
+                    Category = categories.FirstOrDefault(c => c.Id == t.CategoryId),
+                    Amount = t.Amount,
+                    Description = t.Description,
+                    Date = t.Date,
+                    Type = t.Type,
+                    AccountingPercentage = t.AccountingPercentage, // ✅ Afegir
+                    CreatedAt = t.CreatedAt
+                });
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionRequest request)
         {
-            // VALIDAR QUE LA CATEGORIA EXISTEIX
             var category = await _categoriesDataStore.GetByIdAsync(request.CategoryId);
             if (category == null)
                 return BadRequest(new { error = "La categoria no existeix" });
@@ -86,11 +87,12 @@ namespace FinanceApp.API.Controllers
             {
                 Id = data.Transactions.Any() ? data.Transactions.Max(t => t.Id) + 1 : 1,
                 AccountId = request.AccountId,
-                CategoryId = request.CategoryId,  // ← NOMÉS L'ID
+                CategoryId = request.CategoryId,
                 Amount = request.Amount,
                 Description = request.Description,
                 Date = request.Date,
                 Type = request.Type,
+                AccountingPercentage = request.AccountingPercentage, // ✅ Afegir
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -98,6 +100,35 @@ namespace FinanceApp.API.Controllers
             await _dataStore.SaveDataAsync(data);
 
             return CreatedAtAction(nameof(GetAll), new { id = transaction.Id }, transaction);
+        }
+
+        // ✅ NOU: Endpoint PUT per actualitzar
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Transaction>> Update(int id, [FromBody] UpdateTransactionRequest request)
+        {
+            var data = await _dataStore.GetDataAsync();
+            var transaction = data.Transactions.FirstOrDefault(t => t.Id == id);
+
+            if (transaction == null)
+                return NotFound();
+
+            // Validar categoria
+            var category = await _categoriesDataStore.GetByIdAsync(request.CategoryId);
+            if (category == null)
+                return BadRequest(new { error = "La categoria no existeix" });
+
+            // Actualitzar camps
+            transaction.AccountId = request.AccountId;
+            transaction.CategoryId = request.CategoryId;
+            transaction.Amount = request.Amount;
+            transaction.Description = request.Description;
+            transaction.Date = request.Date;
+            transaction.Type = request.Type;
+            transaction.AccountingPercentage = request.AccountingPercentage; // ✅ Afegir
+
+            await _dataStore.SaveDataAsync(data);
+
+            return Ok(transaction);
         }
 
         [HttpDelete("{id}")]
@@ -127,6 +158,7 @@ namespace FinanceApp.API.Controllers
         public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public string Type { get; set; } = string.Empty;
+        public int AccountingPercentage { get; set; } = 100; // ✅ Afegir
         public DateTime CreatedAt { get; set; }
     }
 
@@ -139,5 +171,19 @@ namespace FinanceApp.API.Controllers
         public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public string Type { get; set; } = "expense";
+        public int AccountingPercentage { get; set; } = 100; // ✅ Afegir
+    }
+
+
+    // ✅ NOU: Request per actualitzar
+    public class UpdateTransactionRequest
+    {
+        public int AccountId { get; set; }
+        public int CategoryId { get; set; }
+        public decimal Amount { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public int AccountingPercentage { get; set; } = 100;
     }
 }

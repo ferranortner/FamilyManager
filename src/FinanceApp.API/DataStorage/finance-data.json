@@ -9,6 +9,7 @@
       "description": "bizum",
       "date": "2026-03-11T00:00:00",
       "type": "income",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-12T16:30:51.3656476Z"
     },
     {
@@ -19,6 +20,7 @@
       "description": "Col\u00B7legi N\u00FAria",
       "date": "2025-01-13T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T11:55:48.7992501Z"
     },
     {
@@ -29,6 +31,7 @@
       "description": "Col\u00B7legi Xavier",
       "date": "2025-01-13T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T11:56:27.2744868Z"
     },
     {
@@ -39,6 +42,7 @@
       "description": "Col\u00B7legi Iv\u00E0n",
       "date": "2025-01-13T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T11:57:11.5181345Z"
     },
     {
@@ -49,6 +53,7 @@
       "description": "Sina\u00ED",
       "date": "2025-01-12T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:04:31.1908679Z"
     },
     {
@@ -59,6 +64,7 @@
       "description": "Kith",
       "date": "2025-01-12T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:05:09.6222818Z"
     },
     {
@@ -66,9 +72,10 @@
       "accountId": 1,
       "categoryId": 15,
       "amount": 1000,
-      "description": "Part 1",
+      "description": "Mar\u00E7 1",
       "date": "2026-03-01T00:00:00",
       "type": "income",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:26:08.6613733Z"
     },
     {
@@ -76,9 +83,10 @@
       "accountId": 1,
       "categoryId": 16,
       "amount": 1000,
-      "description": "Part 2",
+      "description": "Mar\u00E7 2",
       "date": "2026-03-01T00:00:00",
       "type": "income",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:26:32.5866412Z"
     },
     {
@@ -87,8 +95,9 @@
       "categoryId": 13,
       "amount": 96.18,
       "description": "Col\u00B7legi N\u00FAria",
-      "date": "2026-03-09T00:00:00",
+      "date": "2026-03-08T00:00:00",
       "type": "expense",
+      "accountingPercentage": 50,
       "createdAt": "2026-03-13T12:27:32.4585627Z"
     },
     {
@@ -99,6 +108,7 @@
       "description": "Col\u00B7legi Xavier",
       "date": "2026-03-09T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:27:53.0291097Z"
     },
     {
@@ -109,6 +119,7 @@
       "description": "Col\u00B7legi Iv\u00E0n",
       "date": "2026-03-09T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:28:13.9986448Z"
     },
     {
@@ -119,6 +130,7 @@
       "description": "Sina\u00ED",
       "date": "2026-03-09T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:28:34.4067583Z"
     },
     {
@@ -129,7 +141,19 @@
       "description": "Lloger",
       "date": "2026-03-02T00:00:00",
       "type": "expense",
+      "accountingPercentage": 100,
       "createdAt": "2026-03-13T12:31:34.9702477Z"
+    },
+    {
+      "id": 17,
+      "accountId": 1,
+      "categoryId": 7,
+      "amount": 5,
+      "description": "prova",
+      "date": "2026-03-15T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 50,
+      "createdAt": "2026-03-16T15:29:52.486778Z"
     }
   ],
   "budgets": []

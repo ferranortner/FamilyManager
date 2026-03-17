@@ -39,6 +39,7 @@ export const financeService = {
       description: data.description,
       date: data.date,
       type: data.type,
+      accountingPercentage: parseInt(data.accountingPercentage) || 100, // ✅ Afegir aquesta línia
     }
 
     console.log('FinanceService - Enviant:', payload)
@@ -60,5 +61,23 @@ export const financeService = {
 
   async getSummary(year, month) {
     return apiService.request(`/transactions/summary?year=${year}&month=${month}`)
+  },
+  async updateTransaction(id, data) {
+    const payload = {
+      accountId: parseInt(data.accountId) || 1,
+      categoryId: parseInt(data.categoryId),
+      amount: parseFloat(data.amount),
+      description: data.description,
+      date: data.date,
+      type: data.type,
+      accountingPercentage: parseInt(data.accountingPercentage) || 100,
+    }
+
+    console.log('FinanceService - Actualitzant:', id, payload)
+
+    return apiService.request(`/transactions/${id}`, {
+      method: 'PUT',
+      body: payload,
+    })
   },
 }
