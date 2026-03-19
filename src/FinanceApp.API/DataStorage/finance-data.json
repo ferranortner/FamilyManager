@@ -143,6 +143,61 @@
       "type": "expense",
       "accountingPercentage": 50,
       "createdAt": "2026-03-17T13:51:19.1825282Z"
+    },
+    {
+      "id": 18,
+      "accountId": 1,
+      "categoryId": 9,
+      "amount": 350.8,
+      "description": "Col\u00B7legi Iv\u00E0n",
+      "date": "2026-02-10T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 50,
+      "createdAt": "2026-03-17T14:52:10.2081441Z"
+    },
+    {
+      "id": 19,
+      "accountId": 1,
+      "categoryId": 10,
+      "amount": 147,
+      "description": "Col\u00B7legi Xavier",
+      "date": "2026-02-10T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 50,
+      "createdAt": "2026-03-17T14:53:02.2658756Z"
+    },
+    {
+      "id": 20,
+      "accountId": 1,
+      "categoryId": 13,
+      "amount": 96.18,
+      "description": "Col\u00B7legi N\u00FAria",
+      "date": "2026-02-10T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 50,
+      "createdAt": "2026-03-17T14:53:32.951854Z"
+    },
+    {
+      "id": 21,
+      "accountId": 1,
+      "categoryId": 21,
+      "amount": 60,
+      "description": "Sina\u00ED",
+      "date": "2026-02-10T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 50,
+      "createdAt": "2026-03-17T14:53:58.626605Z"
+    },
+    {
+      "id": 22,
+      "accountId": 1,
+      "categoryId": 19,
+      "amount": 200,
+      "description": "Roboci\u00E8ncia (1/2)",
+      "date": "2026-02-08T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 50,
+      "createdAt": "2026-03-17T14:54:39.6584861Z"
     }
   ],
   "budgets": []

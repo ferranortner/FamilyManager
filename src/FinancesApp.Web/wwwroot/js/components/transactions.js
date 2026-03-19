@@ -7,8 +7,10 @@ export class TransactionManager {
     this.container = document.getElementById(containerId)
     this.categories = []
     this.transactions = []
+    this.filteredTransactions = []
     this.sortField = 'date'
     this.sortDirection = 'desc'
+    this.selectedCategory = 'all'
   }
 
   async render() {
@@ -21,31 +23,59 @@ export class TransactionManager {
       this.categories = []
     }
 
+    // Layout compacte: tot en una línia de capçalera
     this.container.innerHTML = `
-      <div class="transactions-header">
-        <h2>Transaccions</h2>
-        <button class="btn btn-primary" id="add-btn">+ Nova Transacció</button>
-      </div>
+      <div class="transactions-page">
+        <div class="page-header-compact">
+          
+          
+          <div class="header-controls">
+            <div class="control-group">
+              <label for="category-filter">Categoria</label>
+              <select id="category-filter">
+                <option value="all">Totes</option>
+                ${this.categories
+                  .map(
+                    c => `
+                  <option value="${c.id}">${c.icon || '•'} ${c.name}</option>
+                `
+                  )
+                  .join('')}
+              </select>
+            </div>
 
-      <div class="transactions-controls">
-        <div class="sort-controls">
-          <label>Ordenar per:</label>
-          <select id="sort-field">
-            <option value="date" selected>Data</option>
-            <option value="amount">Import</option>
-          </select>
-          <button id="sort-direction" class="btn-sort" title="Canviar direcció">
-            <span id="sort-icon">↓</span>
-          </button>
+            <div class="control-group">
+              <label for="sort-field">Ordenar</label>
+              <div class="sort-wrapper">
+                <select id="sort-field">
+                  <option value="date" selected>Data</option>
+                  <option value="amount">Import</option>
+                </select>
+                <button id="sort-direction" class="btn-sort" title="Canviar direcció">
+                  <span id="sort-icon">↓</span>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="add-btn">+ Nova</button>
+          </div>
         </div>
-      </div>
 
-      <div id="transactions-list" class="transactions-list">
-        <p class="loading">Carregant transaccions...</p>
+        <div class="transactions-summary" id="transactions-summary"></div>
+
+        <div id="transactions-list" class="transactions-list-full">
+          <p class="loading">Carregant transaccions...</p>
+        </div>
       </div>
     `
 
+    // Event listeners
     document.getElementById('add-btn').addEventListener('click', () => this.openModal())
+
+    document.getElementById('category-filter').addEventListener('change', e => {
+      this.selectedCategory = e.target.value
+      this.applyFilters()
+    })
 
     document.getElementById('sort-field').addEventListener('change', e => {
       this.sortField = e.target.value
@@ -62,30 +92,75 @@ export class TransactionManager {
   }
 
   async loadTransactions() {
-    const listContainer = document.getElementById('transactions-list')
-
     try {
       this.transactions = await financeService.getTransactions()
+      this.filteredTransactions = [...this.transactions]
 
       if (!this.transactions || this.transactions.length === 0) {
-        listContainer.innerHTML = `
-          <div class="empty-state">
-            <p>No hi ha transaccions</p>
-            <p class="hint">Fes clic a "+ Nova Transacció" per afegir-ne una</p>
-          </div>
-        `
+        this.showEmptyState()
         return
       }
 
-      this.renderSortedTransactions()
+      this.applyFilters()
     } catch (err) {
       console.error('Error carregant transaccions:', err)
-      listContainer.innerHTML = `
+      document.getElementById('transactions-list').innerHTML = `
         <div class="error-state">
           <p>Error carregant les transaccions</p>
           <p class="error-detail">${err.message}</p>
         </div>
       `
+    }
+  }
+
+  showEmptyState() {
+    document.getElementById('transactions-list').innerHTML = `
+      <div class="empty-state-full">
+        <div class="empty-icon">📭</div>
+        <p>No hi ha transaccions</p>
+        <p class="hint">Fes clic a "+ Nova" per començar</p>
+      </div>
+    `
+  }
+
+  applyFilters() {
+    if (this.selectedCategory === 'all') {
+      this.filteredTransactions = [...this.transactions]
+    } else {
+      const categoryId = parseInt(this.selectedCategory)
+      this.filteredTransactions = this.transactions.filter(t => t.categoryId === categoryId)
+    }
+
+    this.updateSummary()
+    this.renderSortedTransactions()
+  }
+
+  updateSummary() {
+    const summaryEl = document.getElementById('transactions-summary')
+    if (!summaryEl) return
+
+    const count = this.filteredTransactions.length
+
+    if (this.selectedCategory !== 'all') {
+      const category = this.categories.find(c => c.id === parseInt(this.selectedCategory))
+      const total = this.filteredTransactions.reduce((sum, t) => {
+        const effective = this.calculateEffectiveAmount(t)
+        return t.type === 'income' ? sum + effective : sum - effective
+      }, 0)
+
+      summaryEl.innerHTML = `
+        <span class="summary-pill" style="border-color: ${category?.color || '#ccc'}">
+          <span class="category-dot" style="background: ${category?.color || '#ccc'}"></span>
+          ${category?.icon || '•'} ${category?.name}: ${count} transaccions | 
+          <strong class="${total >= 0 ? 'income' : 'expense'}">
+            ${total >= 0 ? '+' : ''}${this.formatCurrency(total)}
+          </strong>
+        </span>
+      `
+      summaryEl.style.display = 'block'
+    } else {
+      summaryEl.innerHTML = `<span class="summary-pill total">${count} transaccions totals</span>`
+      summaryEl.style.display = 'block'
     }
   }
 
@@ -95,20 +170,16 @@ export class TransactionManager {
   }
 
   sortTransactions() {
-    const sorted = [...this.transactions]
-
+    const sorted = [...this.filteredTransactions]
     sorted.sort((a, b) => {
       let comparison = 0
-
       if (this.sortField === 'date') {
         comparison = new Date(a.date) - new Date(b.date)
       } else if (this.sortField === 'amount') {
         comparison = this.calculateEffectiveAmount(a) - this.calculateEffectiveAmount(b)
       }
-
       return this.sortDirection === 'desc' ? -comparison : comparison
     })
-
     return sorted
   }
 
@@ -116,33 +187,40 @@ export class TransactionManager {
     const listContainer = document.getElementById('transactions-list')
     const sortedTransactions = this.sortTransactions()
 
+    if (sortedTransactions.length === 0) {
+      listContainer.innerHTML = `
+        <div class="empty-state-full">
+          <div class="empty-icon">🔍</div>
+          <p>Cap transacció amb aquest filtre</p>
+          <button class="btn btn-secondary" onclick="document.getElementById('category-filter').value='all'; document.getElementById('category-filter').dispatchEvent(new Event('change'))">
+            Mostrar totes
+          </button>
+        </div>
+      `
+      return
+    }
+
     listContainer.innerHTML = sortedTransactions.map(t => this.renderTransactionItem(t)).join('')
 
-    // Event listeners per editar (clic a la fila)
+    // Event listeners
     listContainer.querySelectorAll('.transaction-item').forEach(item => {
       item.addEventListener('click', e => {
-        // No obrir modal si es fa clic als botons
         if (e.target.closest('.btn-delete') || e.target.closest('.btn-edit')) return
-        const id = item.dataset.id
-        this.openEditModal(id)
+        this.openEditModal(item.dataset.id)
       })
     })
 
-    // Event listeners per editar (botó explícit)
     listContainer.querySelectorAll('.btn-edit').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation()
-        const id = btn.dataset.id
-        this.openEditModal(id)
+        this.openEditModal(btn.dataset.id)
       })
     })
 
-    // Event listeners per esborrar
     listContainer.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation()
-        const id = e.target.closest('.btn-delete').dataset.id
-        this.deleteTransaction(id)
+        this.deleteTransaction(btn.dataset.id)
       })
     })
   }
@@ -162,41 +240,68 @@ export class TransactionManager {
     })
 
     return `
-      <div class="transaction-item ${hasPartialAccounting ? 'partial-accounting' : ''}" data-id="${t.id}">
-        <div class="transaction-info">
-          <div class="transaction-icon" style="background-color: ${category.color || '#ccc'}">
+      <div class="transaction-item-compact ${hasPartialAccounting ? 'partial' : ''}" data-id="${t.id}">
+        <div class="tx-main">
+          <div class="tx-icon" style="background: ${category.color || '#ccc'}">
             ${category.icon || '💰'}
           </div>
-          <div class="transaction-details">
-            <div class="transaction-description">${t.description || 'Sense descripció'}</div>
-            <div class="transaction-meta">
-              <span class="transaction-date">${dateStr}</span>
-              <span class="transaction-category">${category.name || 'Sense categoria'}</span>
-              ${hasPartialAccounting ? `<span class="percentage-badge">${percentage}% comptabilitzat</span>` : ''}
+          <div class="tx-content">
+            <div class="tx-top">
+              <span class="tx-desc">${t.description || 'Sense descripció'}</span>
+              <span class="tx-amount ${isIncome ? 'income' : 'expense'}">
+                ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(effectiveAmount))}
+              </span>
+            </div>
+            <div class="tx-bottom">
+              <span class="tx-date">${dateStr}</span>
+              <span class="tx-category" style="color: ${category.color || '#666'}">
+                ${category.name || 'Sense categoria'}
+              </span>
+              ${hasPartialAccounting ? `<span class="tx-badge">${percentage}%</span>` : ''}
+              ${hasPartialAccounting ? `<span class="tx-original">(${this.formatCurrency(t.amount)})</span>` : ''}
             </div>
           </div>
         </div>
-        <div class="transaction-amounts">
-          <div class="transaction-amount ${isIncome ? 'income' : 'expense'}">
-            ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(effectiveAmount))}
-            ${hasPartialAccounting ? `<span class="original-amount">(${this.formatCurrency(t.amount)} total)</span>` : ''}
-          </div>
-          <div class="transaction-actions">
-            <button class="btn-edit" data-id="${t.id}" title="Editar">✏️</button>
-            <button class="btn-delete" data-id="${t.id}" title="Eliminar">🗑️</button>
-          </div>
+        <div class="tx-actions">
+          <button class="btn-icon btn-edit" data-id="${t.id}" title="Editar">✏️</button>
+          <button class="btn-icon btn-delete" data-id="${t.id}" title="Eliminar">🗑️</button>
         </div>
       </div>
     `
   }
 
-  // ✏️ NOU: Obrir modal per editar transacció existent
+  async refreshData() {
+    this.transactions = await financeService.getTransactions()
+    this.applyFilters()
+  }
+
+  async deleteTransaction(id) {
+    if (!confirm('Segur que vols eliminar aquesta transacció?')) return
+    try {
+      await financeService.deleteTransaction(id)
+      await this.refreshData()
+    } catch (err) {
+      console.error('Error eliminant transacció:', err)
+      alert('Error eliminant la transacció: ' + err.message)
+    }
+  }
+
+  openModal() {
+    this.openTransactionModal(null)
+  }
+
   openEditModal(transactionId) {
     const transaction = this.transactions.find(t => t.id == transactionId)
     if (!transaction) {
       alert('Transacció no trobada')
       return
     }
+    this.openTransactionModal(transaction)
+  }
+
+  openTransactionModal(transaction = null) {
+    const isEdit = transaction !== null
+    const title = isEdit ? 'Editar Transacció' : 'Nova Transacció'
 
     if (this.categories.length === 0) {
       alert('No hi ha categories disponibles.')
@@ -204,191 +309,9 @@ export class TransactionManager {
     }
 
     const categoryOptions = this.categories
-      .map(
-        c =>
-          `<option value="${c.id}" ${c.id === transaction.categoryId ? 'selected' : ''}>
-        ${c.icon || '•'} ${c.name} (${c.type === 'income' ? 'Ingrés' : 'Despesa'})
-      </option>`
-      )
-      .join('')
-
-    const percentage = transaction.accountingPercentage || 100
-    const dateStr = new Date(transaction.date).toISOString().split('T')[0]
-
-    const modal = document.createElement('div')
-    modal.className = 'modal-overlay'
-    modal.innerHTML = `
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Editar Transacció</h3>
-          <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
-        </div>
-
-        <form id="transaction-form">
-          <input type="hidden" name="id" value="${transaction.id}">
-
-          <div class="form-group">
-            <label for="description">Descripció *</label>
-            <input type="text" id="description" name="description" required 
-                   value="${transaction.description || ''}"
-                   placeholder="Ex: Compra al supermercat">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="amount">Import total (€) *</label>
-              <input type="number" id="amount" name="amount" step="0.01" min="0.01" required 
-                     value="${transaction.amount}"
-                     placeholder="0.00">
-            </div>
-
-            <div class="form-group">
-              <label for="date">Data *</label>
-              <input type="date" id="date" name="date" 
-                     value="${dateStr}" required>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="type">Tipus *</label>
-              <select id="type" name="type" required>
-                <option value="expense" ${transaction.type === 'expense' ? 'selected' : ''}>Despesa</option>
-                <option value="income" ${transaction.type === 'income' ? 'selected' : ''}>Ingrés</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="categoryId">Categoria *</label>
-              <select id="categoryId" name="categoryId" required>
-                <option value="">Selecciona...</option>
-                ${categoryOptions}
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group percentage-control">
-            <label for="accountingPercentage">Percentatge a comptabilitzar</label>
-            <div class="percentage-input-wrapper">
-              <input type="range" id="percentage-slider" min="1" max="100" value="${percentage}" 
-                     class="percentage-slider">
-              <div class="percentage-field">
-                <input type="number" id="accountingPercentage" name="accountingPercentage" 
-                       min="1" max="100" value="${percentage}" class="percentage-number">
-                <span class="percentage-symbol">%</span>
-              </div>
-            </div>
-            <p class="percentage-hint">
-              <span id="effective-amount-hint"></span>
-            </p>
-          </div>
-
-          <input type="hidden" name="accountId" value="${transaction.accountId || 1}">
-
-          <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
-              Cancel·lar
-            </button>
-            <button type="submit" class="btn btn-primary">Actualitzar</button>
-          </div>
-        </form>
-      </div>
-    `
-
-    document.body.appendChild(modal)
-
-    // Sincronitzar slider i input numèric
-    const slider = document.getElementById('percentage-slider')
-    const numberInput = document.getElementById('accountingPercentage')
-    const hint = document.getElementById('effective-amount-hint')
-    const amountInput = document.getElementById('amount')
-
-    const updateHint = () => {
-      const pct = parseInt(slider.value)
-      const amt = parseFloat(amountInput.value) || 0
-      const effective = ((amt * pct) / 100).toFixed(2)
-      hint.textContent = `S'aplicarà: ${pct}% = ${this.formatCurrency(effective)}`
-    }
-
-    slider.addEventListener('input', () => {
-      numberInput.value = slider.value
-      updateHint()
-    })
-
-    numberInput.addEventListener('input', () => {
-      let val = parseInt(numberInput.value) || 100
-      val = Math.max(1, Math.min(100, val))
-      slider.value = val
-      updateHint()
-    })
-
-    amountInput.addEventListener('input', updateHint)
-    updateHint() // Inicialitzar
-
-    document.getElementById('description').focus()
-
-    document.getElementById('transaction-form').addEventListener('submit', async e => {
-      e.preventDefault()
-
-      const formData = new FormData(e.target)
-      const data = {
-        id: parseInt(formData.get('id')),
-        description: formData.get('description').trim(),
-        amount: parseFloat(formData.get('amount')),
-        type: formData.get('type'),
-        date: formData.get('date'),
-        categoryId: parseInt(formData.get('categoryId')),
-        accountId: parseInt(formData.get('accountId')) || 1,
-        accountingPercentage: parseInt(formData.get('accountingPercentage')) || 100,
-      }
-
-      if (!data.description || isNaN(data.amount) || data.amount <= 0) {
-        alert('Si us plau, introdueix una descripció i un import vàlid')
-        return
-      }
-
-      if (!data.categoryId) {
-        alert('Si us plau, selecciona una categoria')
-        return
-      }
-
-      try {
-        const updatedTransaction = await financeService.updateTransaction(data.id, data)
-        modal.remove()
-
-        // Actualitzar la transacció a la llista local
-        const index = this.transactions.findIndex(t => t.id === data.id)
-        if (index !== -1) {
-          this.transactions[index] = updatedTransaction
-        }
-
-        this.renderSortedTransactions()
-      } catch (err) {
-        console.error('Error actualitzant transacció:', err)
-        alert('Error actualitzant la transacció: ' + err.message)
-      }
-    })
-  }
-
-  // ➕ Modal per nova transacció (refactoritzat per reutilitzar codi)
-  openModal() {
-    this.openTransactionModal(null)
-  }
-
-  // 🔄 Modal genèric (crear o editar)
-  openTransactionModal(transaction = null) {
-    const isEdit = transaction !== null
-    const title = isEdit ? 'Editar Transacció' : 'Nova Transacció'
-
-    if (this.categories.length === 0) {
-      alert('No hi ha categories disponibles. Crea categories primer.')
-      return
-    }
-
-    const categoryOptions = this.categories
       .map(c => {
         const selected = isEdit && c.id === transaction.categoryId ? 'selected' : ''
-        return `<option value="${c.id}" ${selected}>${c.icon || '•'} ${c.name} (${c.type === 'income' ? 'Ingrés' : 'Despesa'})</option>`
+        return `<option value="${c.id}" ${selected}>${c.icon || '•'} ${c.name}</option>`
       })
       .join('')
 
@@ -403,72 +326,56 @@ export class TransactionManager {
           <h3>${title}</h3>
           <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
         </div>
-
         <form id="transaction-form">
           ${isEdit ? `<input type="hidden" name="id" value="${transaction.id}">` : ''}
-
+          
           <div class="form-group">
-            <label for="description">Descripció *</label>
-            <input type="text" id="description" name="description" required 
-                   value="${isEdit ? transaction.description || '' : ''}"
-                   placeholder="Ex: Compra al supermercat">
+            <label>Descripció *</label>
+            <input type="text" name="description" required value="${isEdit ? transaction.description || '' : ''}" placeholder="Ex: Compra al supermercat">
           </div>
-
+          
           <div class="form-row">
             <div class="form-group">
-              <label for="amount">Import total (€) *</label>
-              <input type="number" id="amount" name="amount" step="0.01" min="0.01" required 
-                     value="${isEdit ? transaction.amount : ''}"
-                     placeholder="0.00">
+              <label>Import (€) *</label>
+              <input type="number" name="amount" step="0.01" min="0.01" required value="${isEdit ? transaction.amount : ''}">
             </div>
-
             <div class="form-group">
-              <label for="date">Data *</label>
-              <input type="date" id="date" name="date" 
-                     value="${dateStr}" required>
+              <label>Data *</label>
+              <input type="date" name="date" required value="${dateStr}">
             </div>
           </div>
-
+          
           <div class="form-row">
             <div class="form-group">
-              <label for="type">Tipus *</label>
-              <select id="type" name="type" required>
+              <label>Tipus *</label>
+              <select name="type" required>
                 <option value="expense" ${isEdit && transaction.type === 'expense' ? 'selected' : ''}>Despesa</option>
                 <option value="income" ${isEdit && transaction.type === 'income' ? 'selected' : ''}>Ingrés</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label for="categoryId">Categoria *</label>
-              <select id="categoryId" name="categoryId" required>
+              <label>Categoria *</label>
+              <select name="categoryId" required>
                 <option value="">Selecciona...</option>
                 ${categoryOptions}
               </select>
             </div>
           </div>
-
-          <div class="form-group percentage-control">
-            <label for="accountingPercentage">Percentatge a comptabilitzar</label>
-            <div class="percentage-input-wrapper">
-              <input type="range" id="percentage-slider" min="1" max="100" value="${percentage}" 
-                     class="percentage-slider">
-              <div class="percentage-field">
-                <input type="number" id="accountingPercentage" name="accountingPercentage" 
-                       min="1" max="100" value="${percentage}" class="percentage-number">
-                <span class="percentage-symbol">%</span>
-              </div>
+          
+          <div class="form-group">
+            <label>Percentatge a comptabilitzar</label>
+            <div class="percentage-control">
+              <input type="range" id="pct-slider" min="1" max="100" value="${percentage}">
+              <input type="number" name="accountingPercentage" id="pct-input" min="1" max="100" value="${percentage}">
+              <span>%</span>
             </div>
-            <p class="percentage-hint">
-              <span id="effective-amount-hint"></span>
-            </p>
+            <small id="pct-hint"></small>
           </div>
-
+          
           <input type="hidden" name="accountId" value="${isEdit ? transaction.accountId || 1 : 1}">
-
+          
           <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
-              Cancel·lar
-            </button>
+            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel·lar</button>
             <button type="submit" class="btn btn-primary">${isEdit ? 'Actualitzar' : 'Guardar'}</button>
           </div>
         </form>
@@ -477,39 +384,31 @@ export class TransactionManager {
 
     document.body.appendChild(modal)
 
-    // Sincronitzar slider i input numèric
-    const slider = document.getElementById('percentage-slider')
-    const numberInput = document.getElementById('accountingPercentage')
-    const hint = document.getElementById('effective-amount-hint')
-    const amountInput = document.getElementById('amount')
+    // Sincronitzar slider i input
+    const slider = document.getElementById('pct-slider')
+    const input = document.getElementById('pct-input')
+    const hint = document.getElementById('pct-hint')
+    const amountInput = document.querySelector('input[name="amount"]')
 
     const updateHint = () => {
       const pct = parseInt(slider.value)
       const amt = parseFloat(amountInput.value) || 0
-      const effective = ((amt * pct) / 100).toFixed(2)
-      hint.textContent = `S'${isEdit ? 'aplicarà' : 'afegirà'}: ${pct}% = ${this.formatCurrency(effective)}`
+      hint.textContent = `${pct}% = ${this.formatCurrency((amt * pct) / 100)}`
     }
 
     slider.addEventListener('input', () => {
-      numberInput.value = slider.value
+      input.value = slider.value
       updateHint()
     })
-
-    numberInput.addEventListener('input', () => {
-      let val = parseInt(numberInput.value) || 100
-      val = Math.max(1, Math.min(100, val))
-      slider.value = val
+    input.addEventListener('input', () => {
+      slider.value = input.value
       updateHint()
     })
-
     amountInput.addEventListener('input', updateHint)
     updateHint()
 
-    document.getElementById('description').focus()
-
     document.getElementById('transaction-form').addEventListener('submit', async e => {
       e.preventDefault()
-
       const formData = new FormData(e.target)
       const data = {
         description: formData.get('description').trim(),
@@ -521,61 +420,25 @@ export class TransactionManager {
         accountingPercentage: parseInt(formData.get('accountingPercentage')) || 100,
       }
 
-      if (isEdit) {
-        data.id = parseInt(formData.get('id'))
-      }
+      if (isEdit) data.id = parseInt(formData.get('id'))
 
-      if (!data.description || isNaN(data.amount) || data.amount <= 0) {
-        alert('Si us plau, introdueix una descripció i un import vàlid')
-        return
-      }
-
-      if (!data.categoryId) {
-        alert('Si us plau, selecciona una categoria')
+      if (!data.description || !data.amount || !data.categoryId) {
+        alert('Completa tots els camps obligatoris')
         return
       }
 
       try {
-        let result
         if (isEdit) {
-          result = await financeService.updateTransaction(data.id, data)
-          const index = this.transactions.findIndex(t => t.id === data.id)
-          if (index !== -1) this.transactions[index] = result
+          await financeService.updateTransaction(data.id, data)
         } else {
-          result = await financeService.addTransaction(data)
-          this.transactions.unshift(result)
+          await financeService.addTransaction(data)
         }
-
         modal.remove()
-        this.renderSortedTransactions()
+        await this.refreshData()
       } catch (err) {
-        console.error(isEdit ? 'Error actualitzant transacció:' : 'Error creant transacció:', err)
-        alert(`Error ${isEdit ? 'actualitzant' : 'guardant'} la transacció: ` + err.message)
+        alert('Error: ' + err.message)
       }
     })
-  }
-
-  // Mètode antic (per compatibilitat)
-  openEditModal(transactionId) {
-    const transaction = this.transactions.find(t => t.id == transactionId)
-    if (!transaction) {
-      alert('Transacció no trobada')
-      return
-    }
-    this.openTransactionModal(transaction)
-  }
-
-  async deleteTransaction(id) {
-    if (!confirm('Segur que vols eliminar aquesta transacció?')) return
-
-    try {
-      await financeService.deleteTransaction(id)
-      this.transactions = this.transactions.filter(t => t.id !== id)
-      this.renderSortedTransactions()
-    } catch (err) {
-      console.error('Error eliminant transacció:', err)
-      alert('Error eliminant la transacció: ' + err.message)
-    }
   }
 
   formatCurrency(amount) {
@@ -583,13 +446,5 @@ export class TransactionManager {
       style: 'currency',
       currency: 'EUR',
     }).format(amount)
-  }
-
-  getTotalEffectiveAmount(type = null) {
-    return this.transactions.filter(t => type === null || t.type === type).reduce((sum, t) => sum + this.calculateEffectiveAmount(t), 0)
-  }
-
-  getTransactionsByPercentage(percentage) {
-    return this.transactions.filter(t => (t.accountingPercentage || 100) === percentage)
   }
 }

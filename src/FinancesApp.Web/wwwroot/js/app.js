@@ -4,10 +4,14 @@ import { categoryService } from './services/categoryService.js'
 import { Dashboard } from './components/dashboard.js'
 import { CategoriesManager } from './components/categories.js'
 import { TransactionManager } from './components/transactions.js'
+import { AnalysisPage } from './components/analysis.js'
 
 class App {
   constructor() {
     this.currentView = 'dashboard'
+    // Guardar els serveis com a propietats de la classe
+    this.financeService = financeService
+    this.categoryService = categoryService
     this.init()
   }
 
@@ -24,7 +28,7 @@ class App {
 
   async initializeDefaultData() {
     try {
-      const categories = await categoryService.getAll()
+      const categories = await this.categoryService.getAll()
 
       if (categories.length === 0) {
         console.log('Creant categories per defecte...')
@@ -43,7 +47,7 @@ class App {
 
         for (const cat of defaultCategories) {
           try {
-            await categoryService.create(cat)
+            await this.categoryService.create(cat)
             console.log('Creada:', cat.name)
           } catch (err) {
             console.error('Error creant', cat.name, ':', err)
@@ -81,7 +85,7 @@ class App {
     switch (view) {
       case 'dashboard':
         title.textContent = 'Dashboard'
-        const dashboard = new Dashboard('main-content', financeService)
+        const dashboard = new Dashboard('main-content', this.financeService)
         await dashboard.render()
         break
 
@@ -97,9 +101,15 @@ class App {
         await transactionManager.render()
         break
 
+      case 'analysis':
+        title.textContent = "Anàlisi d'Evolució"
+        const analysisPage = new AnalysisPage(this.financeService, this.categoryService)
+        await analysisPage.render('main-content')
+        break
+
       default:
         title.textContent = 'Dashboard'
-        const defaultDashboard = new Dashboard('main-content', financeService)
+        const defaultDashboard = new Dashboard('main-content', this.financeService)
         await defaultDashboard.render()
         break
     }
