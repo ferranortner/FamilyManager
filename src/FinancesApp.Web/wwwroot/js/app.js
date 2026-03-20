@@ -5,6 +5,7 @@ import { Dashboard } from './components/dashboard.js'
 import { CategoriesManager } from './components/categories.js'
 import { TransactionManager } from './components/transactions.js'
 import { AnalysisPage } from './components/analysis.js'
+import { TransactionGroups } from './components/TransactionGroups.js'
 
 class App {
   constructor() {
@@ -105,6 +106,12 @@ class App {
         title.textContent = "Anàlisi d'Evolució"
         const analysisPage = new AnalysisPage(this.financeService, this.categoryService)
         await analysisPage.render('main-content')
+        break
+
+      case 'groups':
+        title.textContent = 'Grups de Transaccions'
+        const transactionGroups = new TransactionGroups('main-content')
+        await transactionGroups.render()
         break
 
       default:

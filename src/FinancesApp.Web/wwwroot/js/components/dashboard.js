@@ -94,51 +94,74 @@ export class Dashboard {
   }
 
   generateHTML(summary, dailyData) {
+    const isHidden = localStorage.getItem('dashboardSummaryHidden') === 'true'
+    const isBlurred = localStorage.getItem('dashboardSummaryBlurred') !== 'false'
+
+    // Si està borros, amaga els imports reals
+    const formatAmount = (amount, className) => {
+      if (isBlurred) {
+        return `<div class="amount ${className}">•••••</div>`
+      }
+      return `<div class="amount ${className}">${this.formatCurrency(amount)}</div>`
+    }
+
     return `
-      <div class="dashboard-grid">
-        <div class="card summary-card">
-          <h3>Balanç</h3>
-          <div class="amount ${summary.balance >= 0 ? 'positive' : 'negative'}">
-            ${this.formatCurrency(summary.balance)}
-          </div>
+    <!-- Controls -->
+    <div class="summary-controls" style="display: flex; gap: 10px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;">
+      <label class="toggle-control">
+        <input type="checkbox" id="toggle-visibility" ${isHidden ? '' : 'checked'}>
+        <span class="toggle-label">👁️ Mostrar resum</span>
+      </label>
+      <label class="toggle-control">
+        <input type="checkbox" id="toggle-blur" ${isBlurred ? '' : 'checked'}>
+        <span class="toggle-label">🔒 Desenfocar</span>
+      </label>
+    </div>
+
+    <div class="dashboard-grid ${isBlurred ? 'blurred' : ''}" 
+         id="summary-section" 
+         ${isHidden ? 'style="display:none"' : ''}>
+      <div class="card summary-card">
+        <h3>Balanç</h3>
+        ${formatAmount(summary.balance, summary.balance >= 0 ? 'positive' : 'negative')}
+      </div>
+      <div class="card summary-card">
+        <h3>Ingressos</h3>
+        ${formatAmount(summary.totalIncome, 'positive')}
+      </div>
+      <div class="card summary-card">
+        <h3>Despeses</h3>
+        ${formatAmount(summary.totalExpenses, 'negative')}
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+      <div class="card calendar-card">
+        <div class="calendar-header">
+          <button id="prev-month" class="nav-btn">‹</button>
+          <h3 id="current-month">${this.getMonthYearString()}</h3>
+          <button id="next-month" class="nav-btn">›</button>
         </div>
-        <div class="card summary-card">
-          <h3>Ingressos</h3>
-          <div class="amount positive">${this.formatCurrency(summary.totalIncome)}</div>
-        </div>
-        <div class="card summary-card">
-          <h3>Despeses</h3>
-          <div class="amount negative">${this.formatCurrency(summary.totalExpenses)}</div>
+        <div class="calendar-grid" id="calendar">
+          ${this.generateCalendarHTML(dailyData)}
         </div>
       </div>
 
-      <div class="dashboard-content">
-        <div class="card calendar-card">
-          <div class="calendar-header">
-            <button id="prev-month" class="nav-btn">‹</button>
-            <h3 id="current-month">${this.getMonthYearString()}</h3>
-            <button id="next-month" class="nav-btn">›</button>
-          </div>
-          <div class="calendar-grid" id="calendar">
-            ${this.generateCalendarHTML(dailyData)}
-          </div>
+     <div class="card transactions-card" id="transactions-panel">
+        <div class="transactions-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+          <h3 id="selected-date-title">Transaccions del mes</h3>
+          <button id="close-transactions" class="btn-close-panel" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; width: 24px; height: 24px; text-align: center; line-height: 1; font-weight: bold;">×</button>
         </div>
-
-        <div class="card transactions-card" id="transactions-panel">
-          <div class="transactions-panel-header">
-            <h3 id="selected-date-title">Transaccions del mes</h3>
-            <button id="close-transactions" class="btn-close-panel">✕</button>
-          </div>
-          <div id="transactions-list" class="transactions-list">
-            ${this.renderTransactionsList(this.transactions)}
-          </div>
+        <div id="transactions-list" class="transactions-list" style="max-height: 550px; overflow-y: auto; padding: 10px;">
+          ${this.renderTransactionsList(this.transactions)}
         </div>
       </div>
+    </div>
 
-      <div class="card chart-card">
-        <canvas id="chart"></canvas>
-      </div>
-    `
+    <div class="card chart-card">
+      <canvas id="chart"></canvas>
+    </div>
+  `
   }
 
   async getTransactions(year, month) {
@@ -282,7 +305,7 @@ export class Dashboard {
       .map(t => {
         const isIncome = t.type === 'income'
         const date = new Date(t.date)
-        const timeStr = date.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })
+        const dateStr = date.toLocaleDateString('ca-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
         // ✅ Calcular import efectiu
         const percentage = t.accountingPercentage || 100
@@ -295,7 +318,7 @@ export class Dashboard {
               <div class="transaction-icon">${isIncome ? '📈' : '📉'}</div>
               <div class="transaction-details">
                 <span class="transaction-description">${t.description || 'Sense descripció'}</span>
-                <span class="transaction-time">${timeStr}</span>
+                <span class="transaction-time">${dateStr}</span>
                 ${hasPartialAccounting ? `<span class="percentage-badge">${percentage}%</span>` : ''}
               </div>
             </div>
@@ -336,6 +359,27 @@ export class Dashboard {
       this.updateTransactionsPanel()
       document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'))
     })
+
+    // ✅ Nous toggles per al resum
+    const toggleVisibility = document.getElementById('toggle-visibility')
+    const toggleBlur = document.getElementById('toggle-blur')
+    const summarySection = document.getElementById('summary-section')
+
+    if (toggleVisibility && summarySection) {
+      toggleVisibility.addEventListener('change', e => {
+        const isHidden = !e.target.checked
+        summarySection.style.display = isHidden ? 'none' : ''
+        localStorage.setItem('dashboardSummaryHidden', isHidden.toString())
+      })
+    }
+
+    if (toggleBlur && summarySection) {
+      toggleBlur.addEventListener('change', e => {
+        const isBlurred = !e.target.checked
+        summarySection.classList.toggle('blurred', isBlurred)
+        localStorage.setItem('dashboardSummaryBlurred', isBlurred.toString())
+      })
+    }
   }
 
   selectDay(day) {

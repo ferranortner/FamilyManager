@@ -198,6 +198,50 @@
       "type": "expense",
       "accountingPercentage": 50,
       "createdAt": "2026-03-17T14:54:39.6584861Z"
+    },
+    {
+      "id": 23,
+      "accountId": 1,
+      "categoryId": 18,
+      "amount": 1176,
+      "description": "Lloger Febrer 2026",
+      "date": "2026-02-01T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-19T13:24:34.3597993Z"
+    },
+    {
+      "id": 24,
+      "accountId": 1,
+      "categoryId": 18,
+      "amount": 26,
+      "description": "Compensaci\u00F3 lloger Gener 3026",
+      "date": "2026-02-01T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-19T13:25:18.9016999Z"
+    },
+    {
+      "id": 25,
+      "accountId": 1,
+      "categoryId": 15,
+      "amount": 1000,
+      "description": "Febrer 1",
+      "date": "2026-02-01T00:00:00",
+      "type": "income",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-19T13:27:13.384533Z"
+    },
+    {
+      "id": 26,
+      "accountId": 1,
+      "categoryId": 16,
+      "amount": 1000,
+      "description": "Febrer 2",
+      "date": "2026-02-01T00:00:00",
+      "type": "income",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-19T13:27:38.1705644Z"
     }
   ],
   "budgets": []
