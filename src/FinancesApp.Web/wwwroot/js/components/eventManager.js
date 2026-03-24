@@ -53,7 +53,7 @@ export class EventManager {
       <div class="events-page">
         <!-- Capçalera compacta (mateix estil que transaccions) -->
         <div class="page-header-compact">
-          <h1>📅 Esdeveniments</h1>
+          <h1></h1>
           <div class="header-controls">
             
             <!-- Filtre per tipus -->

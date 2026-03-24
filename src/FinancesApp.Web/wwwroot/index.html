@@ -6,8 +6,10 @@
     <title>FinanceApp</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js "></script> -->
     <script src="js/utils/chart.min.js"></script>
+    <!-- Afegir Material Icons per als icones -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   </head>
   <body>
     <div class="app-container">
@@ -27,6 +29,41 @@
         <header class="top-bar">
           <h1 id="page-title">Dashboard</h1>
           <!-- ← ESTE ID ES IMPORTANTE -->
+
+          <!-- SELECTOR DE TEMES AFEGIT AQUÍ -->
+          <div class="theme-selector">
+            <div class="dropdown">
+              <button class="btn-icon" title="Canviar tema">
+                <i class="material-icons">palette</i>
+              </button>
+              <div class="dropdown-content">
+                <div class="theme-option" data-theme="theme-light">
+                  <div class="theme-preview light"></div>
+                  <span>Tema clar</span>
+                </div>
+                <div class="theme-option" data-theme="theme-dark">
+                  <div class="theme-preview dark"></div>
+                  <span>Tema fosc</span>
+                </div>
+                <div class="theme-option" data-theme="theme-blue">
+                  <div class="theme-preview blue"></div>
+                  <span>Tema blau</span>
+                </div>
+                <div class="theme-option" data-theme="theme-green">
+                  <div class="theme-preview green"></div>
+                  <span>Tema verd</span>
+                </div>
+                <div class="theme-option" data-theme="theme-amber">
+                  <div class="theme-preview amber"></div>
+                  <span>Tema pressec</span>
+                </div>
+                <div class="theme-option" data-theme="theme-metal">
+                  <div class="theme-preview metal"></div>
+                  <span>Tema metàl·lic</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </header>
         <div id="main-content" class="content-area"></div>
       </main>

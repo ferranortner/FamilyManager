@@ -235,7 +235,7 @@ export class Dashboard {
       </div>
     </div>
 
-    <!-- Contingut principal: Calendari + Transaccions + Esdeveniments -->
+    <!-- Contingut principal: Calendari + Panel lateral (Transaccions + Esdeveniments) -->
     <div class="dashboard-content">
       <div class="card calendar-card">
         <div class="calendar-header">
@@ -248,14 +248,30 @@ export class Dashboard {
         </div>
       </div>
 
-      <div class="card transactions-card" id="transactions-panel">
-        <div class="transactions-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
-          <h3 id="selected-date-title">Transaccions del mes</h3>
-          <button id="close-transactions" class="btn-close-panel" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; width: 24px; height: 24px; text-align: center; line-height: 1; font-weight: bold;">×</button>
+      <!-- ✅ PANEL LATERAL MODIFICAT: Transaccions + Esdeveniments -->
+      <div class="side-panel" id="side-panel">
+        
+        <!-- Secció de Transaccions -->
+        <div class="card transactions-card" id="transactions-panel">
+          <div class="transactions-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+            <h3 id="selected-date-title">Transaccions del mes</h3>
+            <button id="close-transactions" class="btn-close-panel" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; width: 24px; height: 24px; text-align: center; line-height: 1; font-weight: bold;">×</button>
+          </div>
+          <div id="transactions-list" class="transactions-list" style="max-height: 300px; overflow-y: auto; padding: 10px;">
+            ${this.renderTransactionsList(this.transactions)}
+          </div>
         </div>
-        <div id="transactions-list" class="transactions-list" style="max-height: 550px; overflow-y: auto; padding: 10px;">
-          ${this.renderTransactionsList(this.transactions)}
+
+        <!-- ✅ NOU: Secció d'Esdeveniments del dia seleccionat -->
+        <div class="card events-day-card" id="events-day-panel" style="margin-top: 1rem;">
+          <div class="events-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color);">
+            <h3 id="selected-date-events-title">Esdeveniments del mes</h3>
+          </div>
+          <div id="events-day-list" class="events-day-list" style="max-height: 200px; overflow-y: auto; padding: 10px;">
+            ${this.renderDayEventsList(this.events)}
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -602,20 +618,35 @@ export class Dashboard {
       }
     })
 
+    // ✅ Això ja actualitza tant transaccions com esdeveniments
     this.updateTransactionsPanel()
   }
 
+  // ✅ MODIFICAT: Actualitzar també el panell d'esdeveniments
   updateTransactionsPanel() {
-    const title = document.getElementById('selected-date-title')
-    const list = document.getElementById('transactions-list')
+    const transactionsTitle = document.getElementById('selected-date-title')
+    const transactionsList = document.getElementById('transactions-list')
+    const eventsTitle = document.getElementById('selected-date-events-title')
+    const eventsList = document.getElementById('events-day-list')
 
     if (this.selectedDay) {
       const dateStr = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.selectedDay).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })
-      title.textContent = `Transaccions - ${dateStr}`
-      list.innerHTML = this.renderTransactionsList(this.transactions, this.selectedDay)
+
+      // Actualitzar transaccions
+      transactionsTitle.textContent = `Transaccions - ${dateStr}`
+      transactionsList.innerHTML = this.renderTransactionsList(this.transactions, this.selectedDay)
+
+      // ✅ Actualitzar esdeveniments del dia
+      eventsTitle.textContent = `Esdeveniments - ${dateStr}`
+      eventsList.innerHTML = this.renderDayEventsList(this.events, this.selectedDay)
     } else {
-      title.textContent = 'Transaccions del mes'
-      list.innerHTML = this.renderTransactionsList(this.transactions)
+      // Mostrar tot el mes
+      transactionsTitle.textContent = 'Transaccions del mes'
+      transactionsList.innerHTML = this.renderTransactionsList(this.transactions)
+
+      // ✅ Mostrar esdeveniments del mes
+      eventsTitle.textContent = 'Esdeveniments del mes'
+      eventsList.innerHTML = this.renderDayEventsList(this.events)
     }
   }
 
@@ -675,5 +706,61 @@ export class Dashboard {
     if (toggleBlur) {
       toggleBlur.checked = !isBlurred
     }
+  }
+
+  // ✅ NOU: Renderitzar llista d'esdeveniments per a un dia específic o tots els del mes
+  renderDayEventsList(events, day = null) {
+    let filteredEvents = events || []
+
+    if (day !== null) {
+      filteredEvents = events.filter(e => this.isEventOnDay(e, day))
+    }
+
+    if (filteredEvents.length === 0) {
+      return `
+      <div class="empty-state">
+        <p>${day ? 'No hi ha esdeveniments aquest dia' : 'No hi ha esdeveniments aquest mes'}</p>
+      </div>
+    `
+    }
+
+    const eventTypeIcons = {
+      medical: '🏥',
+      birthday: '🎂',
+      reminder: '🔔',
+      other: '📌',
+    }
+
+    const sorted = [...filteredEvents].sort((a, b) => new Date(a.date) - new Date(b.date))
+
+    return sorted
+      .map(e => {
+        const icon = eventTypeIcons[e.type] || '📌'
+        const eventDate = new Date(e.date)
+        const isRecurringThisYear = e.isRecurring && eventDate.getFullYear() !== new Date().getFullYear()
+        const isTodayEvent = this.isToday(e)
+
+        const dateOptions = { weekday: 'short', day: 'numeric', month: 'short' }
+        const dateStr = eventDate.toLocaleDateString('ca-ES', dateOptions)
+
+        return `
+        <div class="day-event-item ${isTodayEvent ? 'today' : ''}">
+          <div class="day-event-icon">${icon}</div>
+          <div class="day-event-info">
+            <div class="day-event-title">
+              ${e.title || 'Sense títol'}
+              ${e.isRecurring ? '<span class="day-event-badge recurring">🔄</span>' : ''}
+              ${isTodayEvent ? '<span class="day-event-badge today-badge">Avui</span>' : ''}
+            </div>
+            <div class="day-event-date">
+              ${dateStr}
+              ${isRecurringThisYear ? `<small style="color:#94a3b8">(${eventDate.getFullYear()})</small>` : ''}
+            </div>
+            ${e.notes ? `<div class="day-event-notes">📝 ${e.notes}</div>` : ''}
+          </div>
+        </div>
+      `
+      })
+      .join('')
   }
 }

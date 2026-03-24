@@ -5,13 +5,13 @@ export class CategoriesManager {
     this.container = document.getElementById(containerId)
     this.categories = []
     this.editingId = null
-    this.selectedImage = null // Emmagatzemar la imatge seleccionada
+    this.selectedImage = null
   }
 
   async render() {
     this.container.innerHTML = `
       <div class="categories-header">
-        <h2>Gestió de Categories</h2>
+        <h2></h2>
         <button id="btn-new-category" class="btn btn-primary">+ Nova Categoria</button>
       </div>
 
@@ -120,20 +120,17 @@ export class CategoriesManager {
   }
 
   renderCategoryCard(category) {
-    // Determinar si mostrar emoji o imatge
     const hasImage = category.imageUrl || category.imageData
     const iconDisplay = hasImage ? `<img src="${category.imageUrl || category.imageData}" alt="${category.name}" class="category-img">` : `<span class="category-emoji">${category.icon || '📁'}</span>`
 
     return `
       <div class="category-card" data-id="${category.id}">
-        <div class="category-info">
-          <span class="category-icon-wrapper" style="background: ${category.color}20; color: ${category.color}">
-            ${iconDisplay}
-          </span>
-          <div class="category-details">
-            <span class="category-name">${category.name}</span>
-            <span class="category-meta">${category.type === 'income' ? 'Ingressos' : 'Despeses'}</span>
-          </div>
+        <div class="category-icon-wrapper" style="background: ${category.color}20; color: ${category.color}">
+          ${iconDisplay}
+        </div>
+        <div class="category-details">
+          <span class="category-name">${category.name}</span>
+          <span class="category-meta">${category.type === 'income' ? 'Ingressos' : 'Despeses'}</span>
         </div>
         <div class="category-actions">
           <button class="btn-icon edit" data-id="${category.id}" title="Editar">✏️</button>
@@ -144,19 +141,14 @@ export class CategoriesManager {
   }
 
   attachEvents() {
-    // Nou/Editar
     document.getElementById('btn-new-category')?.addEventListener('click', () => this.showForm())
     document.getElementById('btn-cancel')?.addEventListener('click', () => this.hideForm())
-
-    // Formulari
     document.getElementById('category-form')?.addEventListener('submit', e => this.handleSubmit(e))
 
-    // Tabs d'icona (emoji vs imatge)
     document.querySelectorAll('.icon-tab').forEach(tab => {
       tab.addEventListener('click', e => this.switchIconTab(e.target.dataset.tab))
     })
 
-    // Upload d'imatge
     const uploadArea = document.getElementById('image-upload-area')
     const fileInput = document.getElementById('cat-image')
     const removeBtn = document.getElementById('remove-image')
@@ -196,7 +188,6 @@ export class CategoriesManager {
       this.removeImage()
     })
 
-    // Delegació d'events per editar/eliminar
     document.getElementById('categories-list')?.addEventListener('click', async e => {
       const btn = e.target.closest('.btn-icon')
       if (!btn) return
@@ -212,23 +203,18 @@ export class CategoriesManager {
   }
 
   switchIconTab(tab) {
-    // Actualitzar tabs
     document.querySelectorAll('.icon-tab').forEach(t => t.classList.remove('active'))
     document.querySelector(`.icon-tab[data-tab="${tab}"]`)?.classList.add('active')
-
-    // Mostrar/amagar contingut
     document.getElementById('emoji-content')?.classList.toggle('hidden', tab !== 'emoji')
     document.getElementById('image-content')?.classList.toggle('hidden', tab !== 'image')
   }
 
   handleImageSelect(file) {
-    // Validar tipus de fitxer
     if (!file.type.startsWith('image/')) {
       alert('Si us plau, selecciona un arxiu imatge vàlid')
       return
     }
 
-    // Validar mida (màx. 2MB)
     if (file.size > 2 * 1024 * 1024) {
       alert('La imatge és massa gran. Màxim 2MB.')
       return
@@ -274,7 +260,6 @@ export class CategoriesManager {
     container.classList.remove('hidden')
     title.textContent = category ? 'Editar Categoria' : 'Nova Categoria'
 
-    // Reset imatge
     this.selectedImage = null
     this.removeImage()
     this.switchIconTab('emoji')
@@ -284,7 +269,6 @@ export class CategoriesManager {
       document.getElementById('cat-type').value = category.type
       document.getElementById('cat-color').value = category.color || '#6b7280'
 
-      // Comprovar si té imatge o emoji
       if (category.imageUrl || category.imageData) {
         this.switchIconTab('image')
         this.selectedImage = category.imageUrl || category.imageData
@@ -319,7 +303,6 @@ export class CategoriesManager {
       color: document.getElementById('cat-color').value,
     }
 
-    // Afegir emoji o imatge segons la pestanya activa
     if (activeTab === 'image' && this.selectedImage) {
       category.imageData = this.selectedImage
       category.icon = null

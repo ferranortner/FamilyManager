@@ -41,7 +41,7 @@ namespace FinanceApp.API.Data
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }) ?? new FinanceData();
 
-                Console.WriteLine($"[JsonDataStore] Transaccions: {data.Transactions?.Count ?? 0}");
+                //Console.WriteLine($"[JsonDataStore] Transaccions: {data.Transactions?.Count ?? 0}");
 
                 return data;
             }

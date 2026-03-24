@@ -49,8 +49,8 @@ export class AnalysisPage {
       this.transactions = transactions || []
       this.categories = (categories || []).filter(c => c && c.type === 'expense')
 
-      console.log('✅ Analysis: Transaccions carregades:', this.transactions.length)
-      console.log('✅ Analysis: Categories carregades:', this.categories.length)
+      //console.log('✅ Analysis: Transaccions carregades:', this.transactions.length)
+      //console.log('✅ Analysis: Categories carregades:', this.categories.length)
 
       if (this.categories.length === 0) {
         this.renderContent()
@@ -276,7 +276,7 @@ export class AnalysisPage {
           flex-shrink: 0;
         ">
           <h1 style="margin: 0; font-size: 1.5rem; font-weight: 600; color: #1e293b;">
-            📈 Anàlisi d'Evolució
+            
           </h1>
           <button id="refresh-analysis" style="
             padding: 0.5rem 1rem;
