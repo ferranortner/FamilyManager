@@ -1,11 +1,5 @@
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\appsettings.Development.json
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\appsettings.json
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.staticwebassets.endpoints.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.exe
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.deps.json
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.runtimeconfig.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.dll
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.pdb
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Microsoft.OpenApi.dll
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
@@ -18,6 +12,12 @@ C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceA
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.csproj.CoreCompileInputs.cache
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.MvcApplicationPartsAssemblyInfo.cs
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.MvcApplicationPartsAssemblyInfo.cache
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.sourcelink.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\appsettings.Development.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\appsettings.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\DataStorage\finance-data.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Data\categories.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.staticwebassets.endpoints.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
@@ -30,8 +30,9 @@ C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceA
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.dll
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\refint\FinanceApp.API.dll
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.pdb
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.deps.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.runtimeconfig.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceApp.API.pdb
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.genruntimeconfig.cache
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\ref\FinanceApp.API.dll
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Data\categories.json
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.sourcelink.json
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\DataStorage\finance-data.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Data\events.json

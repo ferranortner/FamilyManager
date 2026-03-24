@@ -1,9 +1,11 @@
 // app.js
 import { financeService } from './services/financeService.js'
 import { categoryService } from './services/categoryService.js'
+import { eventService } from './services/eventService.js' // ✅ NOU
 import { Dashboard } from './components/dashboard.js'
 import { CategoriesManager } from './components/categories.js'
 import { TransactionManager } from './components/transactions.js'
+import { EventManager } from './components/eventManager.js' // ✅ NOU
 import { AnalysisPage } from './components/analysis.js'
 import { TransactionGroups } from './components/TransactionGroups.js'
 
@@ -13,6 +15,7 @@ class App {
     // Guardar els serveis com a propietats de la classe
     this.financeService = financeService
     this.categoryService = categoryService
+    this.eventService = eventService // ✅ NOU
     this.init()
   }
 
@@ -75,6 +78,15 @@ class App {
         e.target.classList.add('active')
       })
     })
+
+    // ✅ NOU: Funció global per navegar des del widget d'esdeveniments
+    window.navigateToEvents = () => {
+      this.navigate('events')
+      // Actualitzar link actiu
+      document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.toggle('active', l.dataset.view === 'events')
+      })
+    }
   }
 
   async navigate(view) {
@@ -86,7 +98,7 @@ class App {
     switch (view) {
       case 'dashboard':
         title.textContent = 'Dashboard'
-        const dashboard = new Dashboard('main-content', this.financeService)
+        const dashboard = new Dashboard('main-content', this.financeService, this.eventService)
         await dashboard.render()
         break
 
@@ -100,6 +112,12 @@ class App {
         title.textContent = 'Transaccions'
         const transactionManager = new TransactionManager('main-content')
         await transactionManager.render()
+        break
+
+      case 'events': // ✅ NOU
+        title.textContent = 'Esdeveniments'
+        const eventManager = new EventManager('main-content')
+        await eventManager.render()
         break
 
       case 'analysis':
@@ -116,7 +134,7 @@ class App {
 
       default:
         title.textContent = 'Dashboard'
-        const defaultDashboard = new Dashboard('main-content', this.financeService)
+        const defaultDashboard = new Dashboard('main-content', this.financeService, this.eventService)
         await defaultDashboard.render()
         break
     }

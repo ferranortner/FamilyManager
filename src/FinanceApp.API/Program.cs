@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FinanceApp.API.Data;
+using FinanceApp.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 // DataStores
 builder.Services.AddSingleton<JsonDataStore>();
 builder.Services.AddSingleton<CategoriesDataStore>();  // ← Sense IServiceCollection
+builder.Services.AddSingleton<EventService>();
 
 // Controllers - UNA SOLA VEGADA amb TOTA la configuració
 builder.Services.AddControllers()

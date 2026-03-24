@@ -1,6 +1,6 @@
 // dashboard.js
 export class Dashboard {
-  constructor(containerId, financeServiceInstance = null) {
+  constructor(containerId, financeServiceInstance = null, eventServiceInstance = null) {
     this.container = document.getElementById(containerId)
 
     if (!this.container) {
@@ -8,14 +8,18 @@ export class Dashboard {
     }
 
     this.financeService = financeServiceInstance || (typeof financeService !== 'undefined' ? financeService : null)
+    this.eventService = eventServiceInstance || (typeof eventService !== 'undefined' ? eventService : null)
+
     this.currentDate = new Date()
     this.chart = null
     this.transactions = []
+    this.events = []
     this.selectedDay = null
 
     console.log('Dashboard inicialitzat:', {
       container: this.container,
       financeService: this.financeService,
+      eventService: this.eventService,
     })
   }
 
@@ -43,7 +47,15 @@ export class Dashboard {
       const dailyData = this.calculateDailyData(this.transactions)
       console.log('DailyData calculat:', dailyData)
 
-      const html = this.generateHTML(summary, dailyData)
+      // ✅ OBTENIR ESDEVENIMENTS DEL MES (per al calendari) - NOU
+      this.events = await this.getEventsByMonth(year, month)
+      console.log('Esdeveniments del mes:', this.events)
+
+      // ✅ OBTENIR ESDEVENIMENTS PROPERS (per al widget) - NOU
+      const upcomingEvents = await this.getUpcomingEvents(7)
+      console.log('Esdeveniments propers:', upcomingEvents)
+
+      const html = this.generateHTML(summary, dailyData, upcomingEvents)
       console.log('HTML generat, inserint al DOM...')
 
       this.container.innerHTML = html
@@ -51,6 +63,10 @@ export class Dashboard {
 
       this.attachCalendarEvents()
       this.renderChart(summary)
+      this.applySummaryState()
+
+      // ✅ Renderitzar widget amb propers esdeveniments
+      this.renderUpcomingEventsWidget(upcomingEvents)
 
       console.log('Render completat')
     } catch (error) {
@@ -63,6 +79,86 @@ export class Dashboard {
         </div>
       `
     }
+  }
+
+  // ✅ NOU: Obtenir esdeveniments del mes (incloent recurrents)
+  async getEventsByMonth(year, month) {
+    if (!this.eventService) return []
+
+    try {
+      // Intentar usar el mètode específic del backend
+      if (typeof this.eventService.getByMonth === 'function') {
+        return await this.eventService.getByMonth(year, month)
+      }
+
+      // Fallback: obtenir tots i filtrar al client
+      const allEvents = await this.eventService.getAll()
+
+      return allEvents.filter(e => {
+        const eventDate = new Date(e.date)
+
+        if (e.isRecurring) {
+          // Per recurrents: només comparem el mes (independentment de l'any)
+          return eventDate.getMonth() + 1 === month
+        } else {
+          // Per no recurrents: any i mes exactes
+          return eventDate.getFullYear() === year && eventDate.getMonth() + 1 === month
+        }
+      })
+    } catch (error) {
+      console.error('Error obtenint esdeveniments del mes:', error)
+      return []
+    }
+  }
+
+  // ✅ NOU: Renderitzar widget d'esdeveniments propers (separat del calendari)
+  renderUpcomingEventsWidget(upcomingEvents) {
+    const widgetContainer = document.querySelector('.events-widget-list')
+    if (!widgetContainer) return
+
+    if (!upcomingEvents || upcomingEvents.length === 0) {
+      widgetContainer.innerHTML = '<div class="empty-events" style="text-align:center;padding:1.5rem;color:#64748b;font-size:0.875rem">Cap esdeveniment proper 🎉</div>'
+      return
+    }
+
+    const eventTypeIcons = {
+      medical: '🏥',
+      birthday: '🎂',
+      reminder: '🔔',
+      other: '📌',
+    }
+
+    const eventsHTML = upcomingEvents
+      .map(e => {
+        const icon = eventTypeIcons[e.type] || '📌'
+        const eventDate = new Date(e.date)
+        const isRecurringThisYear = e.isRecurring && eventDate.getFullYear() !== new Date().getFullYear()
+        const isTodayEvent = this.isToday(e)
+
+        const dateOptions = { weekday: 'short', day: 'numeric', month: 'short' }
+        const dateStr = eventDate.toLocaleDateString('ca-ES', dateOptions)
+
+        return `
+        <div class="widget-event-item ${isTodayEvent ? 'today' : ''}">
+          <div class="widget-event-icon">${icon}</div>
+          <div class="widget-event-info">
+            <div class="widget-event-title">
+              ${e.title || 'Sense títol'}
+              ${e.isRecurring ? '<span class="widget-event-badge recurring" title="Es repeteix cada any">🔄</span>' : ''}
+              ${isTodayEvent ? '<span class="widget-event-badge" style="background:#10b981;color:white">Avui</span>' : ''}
+            </div>
+            <div class="widget-event-date">
+              ${dateStr}
+              ${isRecurringThisYear ? `<small style="color:#94a3b8">(original: ${eventDate.getFullYear()})</small>` : ''}
+            </div>
+            ${e.notes ? `<div class="widget-event-notes" style="font-size:0.75rem;color:#64748b;margin-top:2px">📝 ${e.notes}</div>` : ''}
+          </div>
+        </div>
+      `
+      })
+      .join('')
+
+    widgetContainer.innerHTML = eventsHTML
   }
 
   // ✅ NOU: Calcular summary tenint en compte els percentatges de comptabilització
@@ -93,11 +189,11 @@ export class Dashboard {
     }
   }
 
-  generateHTML(summary, dailyData) {
+  // ✅ MODIFICAT: Rep upcomingEvents com a paràmetre per al widget
+  generateHTML(summary, dailyData, upcomingEvents = []) {
     const isHidden = localStorage.getItem('dashboardSummaryHidden') === 'true'
     const isBlurred = localStorage.getItem('dashboardSummaryBlurred') !== 'false'
 
-    // Si està borros, amaga els imports reals
     const formatAmount = (amount, className) => {
       if (isBlurred) {
         return `<div class="amount ${className}">•••••</div>`
@@ -105,8 +201,11 @@ export class Dashboard {
       return `<div class="amount ${className}">${this.formatCurrency(amount)}</div>`
     }
 
+    // ✅ Widget d'esdeveniments (buit inicialment, es omple després amb renderUpcomingEventsWidget)
+    const eventsWidgetHTML = this.generateEventsWidgetHTML(upcomingEvents)
+
     return `
-    <!-- Controls -->
+    <!-- Controls de privacitat del resum -->
     <div class="summary-controls" style="display: flex; gap: 10px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;">
       <label class="toggle-control">
         <input type="checkbox" id="toggle-visibility" ${isHidden ? '' : 'checked'}>
@@ -118,6 +217,7 @@ export class Dashboard {
       </label>
     </div>
 
+    <!-- Resum financer amb privacitat -->
     <div class="dashboard-grid ${isBlurred ? 'blurred' : ''}" 
          id="summary-section" 
          ${isHidden ? 'style="display:none"' : ''}>
@@ -135,6 +235,7 @@ export class Dashboard {
       </div>
     </div>
 
+    <!-- Contingut principal: Calendari + Transaccions + Esdeveniments -->
     <div class="dashboard-content">
       <div class="card calendar-card">
         <div class="calendar-header">
@@ -147,7 +248,7 @@ export class Dashboard {
         </div>
       </div>
 
-     <div class="card transactions-card" id="transactions-panel">
+      <div class="card transactions-card" id="transactions-panel">
         <div class="transactions-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
           <h3 id="selected-date-title">Transaccions del mes</h3>
           <button id="close-transactions" class="btn-close-panel" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; width: 24px; height: 24px; text-align: center; line-height: 1; font-weight: bold;">×</button>
@@ -158,10 +259,32 @@ export class Dashboard {
       </div>
     </div>
 
+    <!-- Widget d'esdeveniments propers -->
+    ${eventsWidgetHTML}
+
+    <!-- Gràfic (al final perquè es vegi amb scroll) -->
     <div class="card chart-card">
       <canvas id="chart"></canvas>
     </div>
   `
+  }
+
+  // ✅ MODIFICAT: Generar HTML del widget (rep upcomingEvents)
+  generateEventsWidgetHTML(upcomingEvents) {
+    if (!this.eventService) return ''
+
+    return `
+      <div class="card events-widget">
+        <div class="events-widget-header" style="display:flex;justify-content:space-between;align-items:center;padding-bottom:0.5rem;border-bottom:1px solid var(--border-color)">
+          <h4 style="margin:0;font-size:1rem;color:#1e293b">📅 Pròxims esdeveniments</h4>
+          <a href="#events" id="view-all-events" style="font-size:0.875rem;color:var(--primary-color);text-decoration:none">Veure tots →</a>
+        </div>
+        <div class="events-widget-list" style="display:flex;flex-direction:column;gap:0.5rem;max-height:300px;overflow-y:auto;padding-right:4px">
+          <!-- S'omplirà dinàmicament amb renderUpcomingEventsWidget -->
+          <div class="loading-events" style="text-align:center;padding:1rem;color:#64748b">Carregant...</div>
+        </div>
+      </div>
+    `
   }
 
   async getTransactions(year, month) {
@@ -180,6 +303,66 @@ export class Dashboard {
       console.error('Error obtenint transaccions:', error)
       return []
     }
+  }
+
+  // ✅ Obtenir esdeveniments propers (per al widget)
+  async getUpcomingEvents(days = 7) {
+    if (!this.eventService) return []
+    try {
+      if (typeof this.eventService.getUpcomingEvents === 'function') {
+        return await this.eventService.getUpcomingEvents(days)
+      }
+      // Fallback: obtenir tots i filtrar
+      const allEvents = (await this.eventService.getAll?.()) || []
+      return this.filterUpcomingEvents(allEvents, days)
+    } catch (error) {
+      console.error('Error obtenint esdeveniments propers:', error)
+      return []
+    }
+  }
+
+  // ✅ Filtrar esdeveniments propers (fallback)
+  filterUpcomingEvents(events, days = 7) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const futureDate = new Date(today.getTime() + days * 24 * 60 * 60 * 1000)
+
+    return events
+      .filter(e => {
+        const eventDate = new Date(e.date)
+
+        if (e.isRecurring) {
+          const thisYear = new Date(today.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+          const nextYear = new Date(today.getFullYear() + 1, eventDate.getMonth(), eventDate.getDate())
+
+          return (thisYear >= today && thisYear <= futureDate) || (nextYear >= today && nextYear <= futureDate)
+        }
+
+        return eventDate >= today && eventDate <= futureDate
+      })
+      .sort((a, b) => {
+        const getDateForComparison = e => {
+          if (e.isRecurring) {
+            const today = new Date()
+            const eventDate = new Date(e.date)
+            const thisYearDate = new Date(today.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+            return thisYearDate < today ? new Date(today.getFullYear() + 1, eventDate.getMonth(), eventDate.getDate()) : thisYearDate
+          }
+          return new Date(e.date)
+        }
+        return getDateForComparison(a) - getDateForComparison(b)
+      })
+  }
+
+  // ✅ Verificar si un esdeveniment és avui
+  isToday(event) {
+    const today = new Date()
+    const eventDate = new Date(event.date)
+
+    if (event.isRecurring) {
+      return eventDate.getDate() === today.getDate() && eventDate.getMonth() === today.getMonth()
+    }
+    return eventDate.toDateString() === today.toDateString()
   }
 
   calculateDailyData(transactions) {
@@ -204,7 +387,6 @@ export class Dashboard {
           dailyData[day] = { income: 0, expense: 0, transactions: [] }
         }
 
-        // ✅ Aplicar percentatge de comptabilització
         const percentage = t.accountingPercentage || 100
         const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
 
@@ -231,6 +413,7 @@ export class Dashboard {
     return `${mesos[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`
   }
 
+  // ✅ IMPORTANT: Aquest mètode ja utilitza this.events (del mes) per pintar indicadors
   generateCalendarHTML(dailyData) {
     const year = this.currentDate.getFullYear()
     const month = this.currentDate.getMonth()
@@ -261,13 +444,18 @@ export class Dashboard {
       const hasExpense = data.expense > 0
       const hasTransactions = data.transactions.length > 0
 
+      // ✅ Verificar si hi ha esdeveniments aquest dia (usant this.events del mes)
+      const dayEvents = this.events.filter(e => this.isEventOnDay(e, day))
+      const hasEvents = dayEvents.length > 0
+
       html += `
-        <div class="day-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasTransactions ? 'has-transactions' : ''}" 
+        <div class="day-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasTransactions ? 'has-transactions' : ''} ${hasEvents ? 'has-events' : ''}" 
              data-day="${day}">
           <div class="day-number">${day}</div>
           <div class="day-indicators">
             ${hasIncome ? `<div class="indicator income" title="Ingressos: ${this.formatCurrency(data.income)}"></div>` : ''}
             ${hasExpense ? `<div class="indicator expense" title="Despeses: ${this.formatCurrency(data.expense)}"></div>` : ''}
+            ${hasEvents ? `<div class="indicator event" title="${dayEvents.length} esdeveniment${dayEvents.length !== 1 ? 's' : ''}" style="background:#8b5cf6"></div>` : ''}
           </div>
           <div class="day-amounts">
             ${hasIncome ? `<div class="day-income">+${this.formatCurrency(data.income, true)}</div>` : ''}
@@ -279,6 +467,21 @@ export class Dashboard {
 
     html += '</div>'
     return html
+  }
+
+  // ✅ Verificar si un esdeveniment cau en un dia concret del mes actual
+  isEventOnDay(event, day) {
+    const eventDate = new Date(event.date)
+    const currentYear = this.currentDate.getFullYear()
+    const currentMonth = this.currentDate.getMonth()
+
+    if (event.isRecurring) {
+      // Per recursius: comparar dia i mes, independentment de l'any
+      return eventDate.getDate() === day && eventDate.getMonth() === currentMonth
+    }
+
+    // Per no recursius: ha de coincidir dia, mes i any
+    return eventDate.getDate() === day && eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear
   }
 
   renderTransactionsList(transactions, day = null) {
@@ -307,7 +510,6 @@ export class Dashboard {
         const date = new Date(t.date)
         const dateStr = date.toLocaleDateString('ca-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
-        // ✅ Calcular import efectiu
         const percentage = t.accountingPercentage || 100
         const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
         const hasPartialAccounting = percentage !== 100
@@ -360,7 +562,6 @@ export class Dashboard {
       document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'))
     })
 
-    // ✅ Nous toggles per al resum
     const toggleVisibility = document.getElementById('toggle-visibility')
     const toggleBlur = document.getElementById('toggle-blur')
     const summarySection = document.getElementById('summary-section')
@@ -380,6 +581,15 @@ export class Dashboard {
         localStorage.setItem('dashboardSummaryBlurred', isBlurred.toString())
       })
     }
+
+    document.getElementById('view-all-events')?.addEventListener('click', e => {
+      e.preventDefault()
+      if (window.navigateToEvents) {
+        window.navigateToEvents()
+      } else {
+        console.log("Navegar a gestió d'esdeveniments")
+      }
+    })
   }
 
   selectDay(day) {
@@ -451,5 +661,19 @@ export class Dashboard {
         },
       },
     })
+  }
+
+  applySummaryState() {
+    const summarySection = document.getElementById('summary-section')
+    const toggleBlur = document.getElementById('toggle-blur')
+
+    if (!summarySection) return
+
+    const isBlurred = localStorage.getItem('dashboardSummaryBlurred') !== 'false'
+    summarySection.classList.toggle('blurred', isBlurred)
+
+    if (toggleBlur) {
+      toggleBlur.checked = !isBlurred
+    }
   }
 }

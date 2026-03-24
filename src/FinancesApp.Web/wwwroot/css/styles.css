@@ -1,4 +1,4 @@
-/* css/styles.css - VERSIÓ CORREGIDA AMB FIX DE SCROLL */
+/* css/styles.css - VERSIÓ FINAL CORREGIDA */
 
 /* ===== VARIABLES GLOBALS ===== */
 :root {
@@ -27,7 +27,8 @@
 html,
 body {
   height: 100%;
-  overflow: hidden;
+  /* ✅ CORREGIT: permetre scroll al body */
+  overflow-y: auto;
 }
 
 body {
@@ -40,6 +41,7 @@ body {
 .app-container {
   display: flex;
   height: 100vh;
+  /* ✅ CORREGIT: el scroll el gestiona content-area, no aquí */
   overflow: hidden;
 }
 
@@ -53,6 +55,7 @@ body {
   height: 100vh;
   overflow-y: auto;
   flex-shrink: 0;
+  z-index: 50;
 }
 
 .logo {
@@ -89,9 +92,10 @@ body {
   flex: 1;
   margin-left: var(--sidebar-width);
   height: 100vh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* ✅ CORREGIT: overflow visible per permetre scroll intern */
+  overflow: visible;
 }
 
 .top-bar {
@@ -107,8 +111,12 @@ body {
 
 .content-area {
   flex: 1;
-  overflow: hidden;
+  /* ✅ CORREGIT PRINCIPAL: activar scroll vertical aquí */
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 2rem 2rem 2rem;
+  /* ✅ Espai extra al final perquè es vegi el gràfic */
+  padding-bottom: 4rem;
 }
 
 /* ===== CARDS ===== */
@@ -170,7 +178,9 @@ body {
   grid-template-columns: 1fr 400px;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-  height: calc(100% - 100px);
+  /* ✅ CORREGIT: treure height fix que impedia veure contingut */
+  height: auto;
+  min-height: 400px;
 }
 
 @media (max-width: 900px) {
@@ -336,10 +346,13 @@ body {
 .chart-card {
   height: 300px;
   position: relative;
+  /* ✅ Assegurar que es vegi al final */
+  margin-top: 1rem;
 }
 
 .chart-card canvas {
   max-height: 250px;
+  width: 100%;
 }
 
 /* ===== FORMULARIS ===== */
@@ -367,7 +380,7 @@ body {
 .form-group select:focus {
   outline: none;
   border-color: var(--primary-color);
-  ring: 2px solid #bfdbfe;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-group input[type='color'] {
@@ -490,7 +503,7 @@ body {
   margin-top: 1.5rem;
 }
 
-/* ===== TRANSACCIONS - FIX PRINCIPAL ===== */
+/* ===== TRANSACCIONS ===== */
 .transactions-page {
   display: flex;
   flex-direction: column;
@@ -594,7 +607,6 @@ body {
   padding-right: 0.5rem;
 }
 
-/* Scrollbar estilitzada */
 .transactions-list-full::-webkit-scrollbar {
   width: 6px;
 }
@@ -790,7 +802,7 @@ body {
 .sort-select:focus {
   outline: none;
   border-color: #3b82f6;
-  ring: 2px solid #bfdbfe;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .btn-sort {
@@ -1289,7 +1301,6 @@ select.category-select option {
   gap: 1rem;
 }
 
-/* Controls d'anàlisi */
 .analysis-controls {
   display: flex;
   flex-wrap: wrap;
@@ -1315,7 +1326,6 @@ select.category-select option {
   letter-spacing: 0.05em;
 }
 
-/* Botons de període predefinit */
 .period-presets {
   display: flex;
   gap: 0.5rem;
@@ -1345,7 +1355,6 @@ select.category-select option {
   border-color: var(--primary-color);
 }
 
-/* Inputs de data personalitzada */
 .date-inputs {
   display: flex;
   align-items: center;
@@ -1365,7 +1374,6 @@ select.category-select option {
   font-size: 0.875rem;
 }
 
-/* Botons d'agrupació */
 .group-options,
 .type-options {
   display: flex;
@@ -1409,7 +1417,6 @@ select.category-select option {
   border-color: #16a34a;
 }
 
-/* Selector de categories */
 .categories-selector-card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -1452,7 +1459,6 @@ select.category-select option {
   background: #eff6ff;
 }
 
-/* Chips de categories */
 .categories-chips {
   display: flex;
   flex-wrap: wrap;
@@ -1511,7 +1517,6 @@ select.category-select option {
   display: inline;
 }
 
-/* Resum d'anàlisi */
 .analysis-summary {
   flex-shrink: 0;
 }
@@ -1553,7 +1558,6 @@ select.category-select option {
   color: var(--danger-color);
 }
 
-/* Contenidor del gràfic */
 .chart-container-card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -1568,7 +1572,6 @@ select.category-select option {
   max-height: 100%;
 }
 
-/* Taula de dades */
 .data-table-card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -1652,7 +1655,6 @@ select.category-select option {
   border-left: 2px solid #e2e8f0;
 }
 
-/* Scrollbar personalitzada per la taula */
 .table-wrapper::-webkit-scrollbar {
   height: 8px;
   width: 8px;
@@ -1671,7 +1673,6 @@ select.category-select option {
   background: #94a3b8;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .analysis-controls {
     flex-direction: column;
@@ -1736,15 +1737,14 @@ select.category-select option {
     align-items: flex-start;
   }
 }
-/* TransactionGroups.css - Estils per a la vista d'agrupació */
 
+/* TransactionGroups.css */
 .transactions-groups-page {
   height: calc(100vh - 120px);
-  overflow-y: auto; /* ← AIXÒ ÉS EL QUE FALTA */
-  padding-right: 0.5rem; /* ← Perquè la scrollbar no quedi enganxada */
+  overflow-y: auto;
+  padding-right: 0.5rem;
 }
 
-/* Scrollbar estilitzada (opcional) */
 .transactions-groups-page::-webkit-scrollbar {
   width: 6px;
 }
@@ -1763,7 +1763,6 @@ select.category-select option {
   background: #94a3b8;
 }
 
-/* Pestañes d'agrupació */
 .group-tabs {
   display: flex;
   gap: 0.5rem;
@@ -1798,7 +1797,6 @@ select.category-select option {
   font-size: 1.1rem;
 }
 
-/* Filtre d'import */
 .amount-filter {
   display: flex;
   align-items: center;
@@ -1808,7 +1806,6 @@ select.category-select option {
   border-radius: 8px;
   margin: 1rem 0;
   flex-wrap: wrap;
-  top: 80px; /* ← Ajusta segons l'altura de .page-header-compact */
 }
 
 .amount-filter label {
@@ -1835,14 +1832,12 @@ select.category-select option {
   font-weight: 500;
 }
 
-/* Contenidor de grups */
 .groups-container {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-/* Grup de transaccions */
 .transaction-group {
   background: white;
   border-radius: 12px;
@@ -1932,13 +1927,11 @@ select.category-select option {
   background: #ffebee;
 }
 
-/* Contingut del grup */
 .group-content {
   padding: 0.5rem;
   background: white;
 }
 
-/* Items de transacció mini (dins dels grups) */
 .transaction-item-mini {
   display: flex;
   justify-content: space-between;
@@ -2006,7 +1999,6 @@ select.category-select option {
   color: #999;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .group-tabs {
     justify-content: center;
@@ -2035,7 +2027,6 @@ select.category-select option {
   }
 }
 
-/* Animacions */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -2050,7 +2041,7 @@ select.category-select option {
 .group-content {
   animation: slideDown 0.2s ease;
 }
-/* Botó Col·lapsar/Expandir Tot */
+
 #collapse-all-btn {
   display: flex;
   align-items: center;
@@ -2084,7 +2075,6 @@ select.category-select option {
   white-space: nowrap;
 }
 
-/* Responsive: amagar text en mòbils */
 @media (max-width: 768px) {
   #collapse-text {
     display: none;
@@ -2094,19 +2084,16 @@ select.category-select option {
     padding: 0.6rem;
   }
 }
-/* Efecte blur per al resum */
-#summary-section.blurred {
-  filter: blur(8px);
-  pointer-events: none;
-  user-select: none;
-  transition: filter 0.3s ease;
+
+/* ===== TOGGLES DE PRIVACITAT ===== */
+.summary-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-#summary-section.blurred:hover {
-  filter: blur(4px); /* Opcional: lleuger desenfocament al passar el ratolí */
-}
-
-/* Estil pels toggles */
 .toggle-control {
   display: flex;
   align-items: center;
@@ -2124,60 +2111,27 @@ select.category-select option {
 }
 
 .toggle-label {
-  color: var(--text-color, #333);
+  color: var(--text-primary, #333);
 }
 
-/* Suport per a tema fosc/clar */
 @media (prefers-color-scheme: dark) {
   .toggle-label {
     color: #e5e7eb;
   }
 }
 
-/* Efecte blur per al resum */
+/* ===== BLUR MILLORAT - TAPA COMPLETAMENT ELS IMPORTS ===== */
 .dashboard-grid.blurred {
-  filter: blur(8px);
-  pointer-events: none;
-  user-select: none;
-  transition: filter 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Opcional: missatge indicant privacitat */
-.dashboard-grid.blurred::after {
-  content: '🔒 Dades protegides';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  pointer-events: none;
-  z-index: 10;
-  white-space: nowrap;
-}
-
-/* Suport per a tema fosc */
-@media (prefers-color-scheme: dark) {
-  .dashboard-grid.blurred::after {
-    background: rgba(255, 255, 255, 0.85);
-    color: #1f2937;
-  }
-}
-.dashboard-grid.blurred {
-  filter: blur(10px);
+  filter: blur(12px);
   pointer-events: none;
   user-select: none;
   position: relative;
   overflow: hidden;
+  /* ✅ Assegurar que el contingut no es vegi per sota */
+  isolation: isolate;
 }
 
-/* Capa opaca per sobre del blur */
+/* Capa opaca per sobre del blur - TAPA COLORS VERD/VERMELL */
 .dashboard-grid.blurred::before {
   content: '';
   position: absolute;
@@ -2185,35 +2139,324 @@ select.category-select option {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.85); /* Fons blanc semitransparent */
-  z-index: 10;
-  backdrop-filter: blur(10px);
+  /* ✅ Fons més opac per tapar completament els colors */
+  background: rgba(255, 255, 255, 0.92);
+  z-index: 20;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* Missatge opcional al centre */
+/* Missatge al centre */
 .dashboard-grid.blurred::after {
   content: '🔒 Informació protegida';
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
-  z-index: 11;
+  z-index: 21;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Tema fosc */
 @media (prefers-color-scheme: dark) {
   .dashboard-grid.blurred::before {
-    background: rgba(17, 24, 39, 0.85); /* Fons fosc */
+    background: rgba(17, 24, 39, 0.92);
   }
   .dashboard-grid.blurred::after {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     color: #1f2937;
   }
+}
+
+/* Transició suau */
+.dashboard-grid {
+  transition: filter 0.3s ease;
+}
+/* ===== EVENT MANAGER (mateix estil que transaccions) ===== */
+
+.events-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.events-summary {
+  flex-shrink: 0;
+  margin-bottom: 0.75rem;
+}
+
+.events-list-full {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  padding-right: 0.5rem;
+}
+
+.events-list-full::-webkit-scrollbar {
+  width: 6px;
+}
+
+.events-list-full::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.events-list-full::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.events-list-full::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Item d'esdeveniment (estil compacte com transaccions) */
+.event-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+}
+
+.event-item:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: #f9fafb;
+}
+
+.event-item.today {
+  border-left-color: #10b981;
+  background: #f0fdf4;
+}
+
+.event-item.past {
+  opacity: 0.7;
+  border-left-color: #94a3b8;
+}
+
+.ev-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ev-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.ev-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ev-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.ev-title {
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-bottom {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.ev-date {
+  font-weight: 500;
+}
+
+.ev-date.upcoming {
+  color: #10b981;
+}
+
+.ev-category {
+  font-weight: 500;
+}
+
+.ev-notes {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.ev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #eff6ff;
+  color: #3b82f6;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.ev-badge.recurring {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ev-badge.today {
+  background: #10b981;
+  color: white;
+}
+
+.ev-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.event-item:hover .ev-actions {
+  opacity: 1;
+}
+
+/* ===== WIDGET D'ESDEVENIMENTS AL DASHBOARD ===== */
+.events-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.events-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.events-widget-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.events-widget-header a {
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.events-widget-header a:hover {
+  text-decoration: underline;
+}
+
+.events-widget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.events-widget-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.events-widget-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.widget-event-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 3px solid var(--border-color);
+}
+
+.widget-event-item.today {
+  background: #f0fdf4;
+  border-left-color: #10b981;
+}
+
+.widget-event-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.widget-event-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-event-title {
+  font-weight: 500;
+  color: #1e293b;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-event-date {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.widget-event-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #3b82f6;
+  margin-left: 4px;
+}
+
+.widget-event-badge.recurring {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.empty-events {
+  text-align: center;
+  padding: 1.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
 }

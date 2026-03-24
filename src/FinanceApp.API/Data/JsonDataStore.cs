@@ -33,7 +33,7 @@ namespace FinanceApp.API.Data
                 }
 
                 var json = await File.ReadAllTextAsync(_filePath);
-                Console.WriteLine($"[JsonDataStore] JSON llegit: {json.Length} caràcters");
+                //Console.WriteLine($"[JsonDataStore] JSON llegit: {json.Length} caràcters");
 
                 var data = JsonSerializer.Deserialize<FinanceData>(json, new JsonSerializerOptions
                 {

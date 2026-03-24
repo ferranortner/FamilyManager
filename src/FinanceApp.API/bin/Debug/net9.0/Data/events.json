@@ -1,0 +1,34 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Excursi\u00F3 Xavier Natzaret",
+      "type": "reminder",
+      "date": "2026-03-24",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-03-23T17:13:52.0906334Z",
+      "updatedAt": "2026-03-23T17:14:37.2478926Z"
+    },
+    {
+      "id": 2,
+      "title": "Excursi\u00F3 Iv\u00E1n  Natzaret - Les Masies d\u0027Esplugues",
+      "type": "reminder",
+      "date": "2026-03-25",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-03-23T17:15:26.1792603Z",
+      "updatedAt": null
+    },
+    {
+      "id": 3,
+      "title": "Sant Josep - Dia del pare",
+      "type": "reminder",
+      "date": "2026-03-19",
+      "isRecurring": true,
+      "notes": null,
+      "createdAt": "2026-03-23T17:15:48.9991328Z",
+      "updatedAt": null
+    }
+  ]
+}
