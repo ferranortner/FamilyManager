@@ -12,7 +12,6 @@ C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceA
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.csproj.CoreCompileInputs.cache
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.MvcApplicationPartsAssemblyInfo.cs
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.MvcApplicationPartsAssemblyInfo.cache
-C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.sourcelink.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\appsettings.Development.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\appsettings.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\DataStorage\finance-data.json

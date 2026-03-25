@@ -242,6 +242,171 @@
       "type": "income",
       "accountingPercentage": 100,
       "createdAt": "2026-03-19T13:27:38.1705644Z"
+    },
+    {
+      "id": 27,
+      "accountId": 1,
+      "categoryId": 23,
+      "amount": 13.76,
+      "description": "Lidl",
+      "date": "2025-01-11T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:32:54.089005Z"
+    },
+    {
+      "id": 28,
+      "accountId": 1,
+      "categoryId": 24,
+      "amount": 22.29,
+      "description": "Ametller Origen",
+      "date": "2025-01-14T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:33:59.0811366Z"
+    },
+    {
+      "id": 29,
+      "accountId": 1,
+      "categoryId": 25,
+      "amount": 20.52,
+      "description": "Bon Area",
+      "date": "2025-01-28T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:35:03.6305526Z"
+    },
+    {
+      "id": 30,
+      "accountId": 1,
+      "categoryId": 3,
+      "amount": 38.97,
+      "description": "Corte Ingl\u00E9s",
+      "date": "2025-01-27T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:35:39.0685794Z"
+    },
+    {
+      "id": 31,
+      "accountId": 1,
+      "categoryId": 26,
+      "amount": 29.28,
+      "description": "Ikea",
+      "date": "2025-01-29T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:40:44.0703392Z"
+    },
+    {
+      "id": 32,
+      "accountId": 1,
+      "categoryId": 7,
+      "amount": 19.99,
+      "description": "Game",
+      "date": "2025-02-02T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:41:18.6989598Z"
+    },
+    {
+      "id": 33,
+      "accountId": 1,
+      "categoryId": 27,
+      "amount": 33.83,
+      "description": "Capbraro",
+      "date": "2025-02-03T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:42:17.3489978Z"
+    },
+    {
+      "id": 34,
+      "accountId": 1,
+      "categoryId": 23,
+      "amount": 14.52,
+      "description": "Lidl",
+      "date": "2025-02-03T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:42:38.7627187Z"
+    },
+    {
+      "id": 35,
+      "accountId": 1,
+      "categoryId": 23,
+      "amount": 10.41,
+      "description": "Lidl",
+      "date": "2025-02-04T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:43:02.7547613Z"
+    },
+    {
+      "id": 36,
+      "accountId": 1,
+      "categoryId": 3,
+      "amount": 9.99,
+      "description": "Maxi Esplugues",
+      "date": "2025-02-05T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:43:37.4797905Z"
+    },
+    {
+      "id": 37,
+      "accountId": 1,
+      "categoryId": 24,
+      "amount": 15.33,
+      "description": "Ametller Origen",
+      "date": "2025-02-08T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:44:05.7787168Z"
+    },
+    {
+      "id": 38,
+      "accountId": 1,
+      "categoryId": 3,
+      "amount": 10.75,
+      "description": "Maxi Esplugues",
+      "date": "2025-02-11T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:44:31.6902188Z"
+    },
+    {
+      "id": 39,
+      "accountId": 1,
+      "categoryId": 25,
+      "amount": 9.89,
+      "description": "Bon Area",
+      "date": "2025-02-18T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:45:01.5998103Z"
+    },
+    {
+      "id": 40,
+      "accountId": 1,
+      "categoryId": 25,
+      "amount": 25.86,
+      "description": "Bon Area",
+      "date": "2025-02-24T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:45:26.9301296Z"
+    },
+    {
+      "id": 41,
+      "accountId": 1,
+      "categoryId": 27,
+      "amount": 39.81,
+      "description": "Capbraro",
+      "date": "2025-02-25T00:00:00",
+      "type": "expense",
+      "accountingPercentage": 100,
+      "createdAt": "2026-03-24T17:45:51.120047Z"
     }
   ],
   "budgets": []

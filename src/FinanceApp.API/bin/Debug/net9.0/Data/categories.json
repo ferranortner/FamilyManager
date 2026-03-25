@@ -197,6 +197,51 @@
       "icon": "\uD83C\uDFE6",
       "isActive": true,
       "createdAt": "2026-03-13T13:02:01.7760642Z"
+    },
+    {
+      "id": 23,
+      "name": "Lidl - Menjar",
+      "type": "expense",
+      "color": "#f9f33e",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-24T17:32:17.2496017Z"
+    },
+    {
+      "id": 24,
+      "name": "Ametller Origen",
+      "type": "expense",
+      "color": "#9e916b",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-24T17:33:29.5813126Z"
+    },
+    {
+      "id": 25,
+      "name": "Bon Area",
+      "type": "expense",
+      "color": "#2d6ef0",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-24T17:34:38.608417Z"
+    },
+    {
+      "id": 26,
+      "name": "Ikea",
+      "type": "expense",
+      "color": "#f0e138",
+      "icon": "\uD83D\uDED2",
+      "isActive": true,
+      "createdAt": "2026-03-24T17:40:06.3218429Z"
+    },
+    {
+      "id": 27,
+      "name": "Capbrabo",
+      "type": "expense",
+      "color": "#588ffe",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-24T17:41:48.1433087Z"
     }
   ]
 }

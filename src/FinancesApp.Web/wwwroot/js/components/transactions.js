@@ -225,51 +225,6 @@ export class TransactionManager {
     })
   }
 
-  renderTransactionItem(t) {
-    const category = this.categories.find(c => c.id === t.categoryId) || {}
-    const isIncome = t.type === 'income'
-    const percentage = t.accountingPercentage || 100
-    const effectiveAmount = this.calculateEffectiveAmount(t)
-    const hasPartialAccounting = percentage !== 100
-
-    const date = new Date(t.date)
-    const dateStr = date.toLocaleDateString('ca-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    })
-
-    return `
-      <div class="transaction-item-compact ${hasPartialAccounting ? 'partial' : ''}" data-id="${t.id}">
-        <div class="tx-main">
-          <div class="tx-icon" style="background: ${category.color || '#ccc'}">
-            ${category.icon || '💰'}
-          </div>
-          <div class="tx-content">
-            <div class="tx-top">
-              <span class="tx-desc">${t.description || 'Sense descripció'}</span>
-              <span class="tx-amount ${isIncome ? 'income' : 'expense'}">
-                ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(effectiveAmount))}
-              </span>
-            </div>
-            <div class="tx-bottom">
-              <span class="tx-date">${dateStr}</span>
-              <span class="tx-category" style="color: ${category.color || '#666'}">
-                ${category.name || 'Sense categoria'}
-              </span>
-              ${hasPartialAccounting ? `<span class="tx-badge">${percentage}%</span>` : ''}
-              ${hasPartialAccounting ? `<span class="tx-original">(${this.formatCurrency(t.amount)})</span>` : ''}
-            </div>
-          </div>
-        </div>
-        <div class="tx-actions">
-          <button class="btn-icon btn-edit" data-id="${t.id}" title="Editar">✏️</button>
-          <button class="btn-icon btn-delete" data-id="${t.id}" title="Eliminar">🗑️</button>
-        </div>
-      </div>
-    `
-  }
-
   async refreshData() {
     this.transactions = await financeService.getTransactions()
     this.applyFilters()
@@ -446,5 +401,62 @@ export class TransactionManager {
       style: 'currency',
       currency: 'EUR',
     }).format(amount)
+  }
+
+  renderTransactionItem(t) {
+    const category = this.categories.find(c => c.id === t.categoryId) || {}
+    const isIncome = t.type === 'income'
+    const percentage = t.accountingPercentage || 100
+    const effectiveAmount = this.calculateEffectiveAmount(t)
+    const hasPartialAccounting = percentage !== 100
+
+    const date = new Date(t.date)
+    const dateStr = date.toLocaleDateString('ca-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+
+    return `
+    <div class="transaction-item-compact ${hasPartialAccounting ? 'partial' : ''}" data-id="${t.id}">
+      <div class="tx-main">
+        <div class="tx-icon" style="background: ${category.color || '#ccc'}">
+          ${category.icon || '💰'}
+        </div>
+        <div class="tx-content">
+          <div class="tx-top">
+            <span class="tx-desc">${t.description || 'Sense descripció'}</span>
+            <span class="tx-amount ${isIncome ? 'income' : 'expense'}">
+              ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(effectiveAmount))}
+            </span>
+          </div>
+          <div class="tx-bottom">
+            <span class="tx-date">${dateStr}</span>
+            <span class="tx-category" style="color: ${category.color || '#666'}">
+              ${category.name || 'Sense categoria'}
+            </span>
+            ${hasPartialAccounting ? `<span class="tx-badge">${percentage}%</span>` : ''}
+            ${hasPartialAccounting ? `<span class="tx-original">(${this.formatCurrency(t.amount)})</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="tx-actions">
+        <button class="btn-action btn-edit" data-id="${t.id}" title="Editar transacció">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </button>
+        <button class="btn-action btn-delete" data-id="${t.id}" title="Eliminar transacció">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `
   }
 }
