@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "UTnj9bmjmdE=",
+  "dgSpecHash": "bAWhqUkBDEw=",
   "success": true,
   "projectFilePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
   "expectedPackageFiles": [
@@ -11,5 +11,24 @@
     "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\7.2.0\\swashbuckle.aspnetcore.swaggergen.7.2.0.nupkg.sha512",
     "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\7.2.0\\swashbuckle.aspnetcore.swaggerui.7.2.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error al obtener los datos de vulnerabilidad del paquete: No se puede cargar el índice de servicio para el origen https://nuget-pro-v2.winsysgroup.com:8443/v3/index.json.",
+      "projectPath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error al obtener los datos de vulnerabilidad del paquete: No se puede cargar el índice de servicio para el origen https://nuget-pre-v2.winsysgroup.com:8443/v3/index.json.",
+      "projectPath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

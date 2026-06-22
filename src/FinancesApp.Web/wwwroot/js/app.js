@@ -8,6 +8,7 @@ import { TransactionManager } from './components/transactions.js'
 import { EventManager } from './components/eventManager.js'
 import { AnalysisPage } from './components/analysis.js'
 import { TransactionGroups } from './components/TransactionGroups.js'
+import { CategorySummary } from './components/CategorySummary.js'
 
 // ===== GESTIÓ DE TEMES (GLOBAL AMB DELEGACIÓ D'ESDEVENIMENTS) =====
 function initThemeSelector() {
@@ -160,6 +161,11 @@ class App {
         title.textContent = 'Grups de Transaccions'
         const transactionGroups = new TransactionGroups('main-content')
         await transactionGroups.render()
+        break
+      case 'categoriesSummary':
+        title.textContent = 'Resum de Categories'
+        const categorySummary = new CategorySummary('main-content')
+        categorySummary.render()
         break
       default:
         title.textContent = 'Dashboard'

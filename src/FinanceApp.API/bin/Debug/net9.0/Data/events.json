@@ -39,6 +39,36 @@
       "notes": "44",
       "createdAt": "2026-03-24T11:39:26.4935405Z",
       "updatedAt": null
+    },
+    {
+      "id": 5,
+      "title": "Sortida a Moreres - Iv\u00E1n. Jornada esportiva",
+      "type": "other",
+      "date": "2026-03-27",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-03-27T14:33:57.3058594Z",
+      "updatedAt": null
+    },
+    {
+      "id": 6,
+      "title": "Divendres Sant",
+      "type": "other",
+      "date": "2026-04-03",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-03-30T06:33:46.3127958Z",
+      "updatedAt": null
+    },
+    {
+      "id": 7,
+      "title": "Aniversari Aroa",
+      "type": "birthday",
+      "date": "2026-04-08",
+      "isRecurring": true,
+      "notes": "11",
+      "createdAt": "2026-04-08T11:22:26.4086566Z",
+      "updatedAt": null
     }
   ]
 }

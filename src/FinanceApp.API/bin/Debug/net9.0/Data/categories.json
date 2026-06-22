@@ -242,6 +242,51 @@
       "icon": "\uD83C\uDF4E",
       "isActive": true,
       "createdAt": "2026-03-24T17:41:48.1433087Z"
+    },
+    {
+      "id": 28,
+      "name": "Mercadona",
+      "type": "expense",
+      "color": "#197a06",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-25T17:09:09.3245171Z"
+    },
+    {
+      "id": 29,
+      "name": "Charter",
+      "type": "expense",
+      "color": "#ff943d",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-25T17:11:16.5799951Z"
+    },
+    {
+      "id": 30,
+      "name": "La Sirena",
+      "type": "expense",
+      "color": "#042e81",
+      "icon": "\uD83C\uDF4E",
+      "isActive": true,
+      "createdAt": "2026-03-25T17:19:35.2606854Z"
+    },
+    {
+      "id": 31,
+      "name": "Decathlon",
+      "type": "expense",
+      "color": "#1c58ce",
+      "icon": "\uD83D\uDC55",
+      "isActive": true,
+      "createdAt": "2026-03-25T17:23:34.788254Z"
+    },
+    {
+      "id": 32,
+      "name": "Cr\u00E8dit",
+      "type": "expense",
+      "color": "#ff0000",
+      "icon": "\uD83D\uDCB3",
+      "isActive": true,
+      "createdAt": "2026-03-25T17:46:58.4176722Z"
     }
   ]
 }

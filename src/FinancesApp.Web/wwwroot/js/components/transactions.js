@@ -263,81 +263,111 @@ export class TransactionManager {
       return
     }
 
-    const categoryOptions = this.categories
-      .map(c => {
-        const selected = isEdit && c.id === transaction.categoryId ? 'selected' : ''
-        return `<option value="${c.id}" ${selected}>${c.icon || '•'} ${c.name}</option>`
-      })
-      .join('')
+    // Funció per generar opcions de categoria filtrades per tipus
+    const getCategoryOptions = type => {
+      const filteredCategories = this.categories.filter(c => c.type === type)
+      return filteredCategories
+        .map(c => {
+          const selected = isEdit && c.id === transaction.categoryId ? 'selected' : ''
+          return `<option value="${c.id}" ${selected}>${c.icon || '•'} ${c.name}</option>`
+        })
+        .join('')
+    }
 
     const percentage = isEdit ? transaction.accountingPercentage || 100 : 100
     const dateStr = isEdit ? new Date(transaction.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
 
+    // Determinar el tipus inicial
+    const initialType = isEdit ? transaction.type : 'expense'
+
     const modal = document.createElement('div')
     modal.className = 'modal-overlay'
     modal.innerHTML = `
-      <div class="modal">
-        <div class="modal-header">
-          <h3>${title}</h3>
-          <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
-        </div>
-        <form id="transaction-form">
-          ${isEdit ? `<input type="hidden" name="id" value="${transaction.id}">` : ''}
-          
-          <div class="form-group">
-            <label>Descripció *</label>
-            <input type="text" name="description" required value="${isEdit ? transaction.description || '' : ''}" placeholder="Ex: Compra al supermercat">
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label>Import (€) *</label>
-              <input type="number" name="amount" step="0.01" min="0.01" required value="${isEdit ? transaction.amount : ''}">
-            </div>
-            <div class="form-group">
-              <label>Data *</label>
-              <input type="date" name="date" required value="${dateStr}">
-            </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tipus *</label>
-              <select name="type" required>
-                <option value="expense" ${isEdit && transaction.type === 'expense' ? 'selected' : ''}>Despesa</option>
-                <option value="income" ${isEdit && transaction.type === 'income' ? 'selected' : ''}>Ingrés</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Categoria *</label>
-              <select name="categoryId" required>
-                <option value="">Selecciona...</option>
-                ${categoryOptions}
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Percentatge a comptabilitzar</label>
-            <div class="percentage-control">
-              <input type="range" id="pct-slider" min="1" max="100" value="${percentage}">
-              <input type="number" name="accountingPercentage" id="pct-input" min="1" max="100" value="${percentage}">
-              <span>%</span>
-            </div>
-            <small id="pct-hint"></small>
-          </div>
-          
-          <input type="hidden" name="accountId" value="${isEdit ? transaction.accountId || 1 : 1}">
-          
-          <div class="modal-actions">
-            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel·lar</button>
-            <button type="submit" class="btn btn-primary">${isEdit ? 'Actualitzar' : 'Guardar'}</button>
-          </div>
-        </form>
+    <div class="modal">
+      <div class="modal-header">
+        <h3>${title}</h3>
+        <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
       </div>
-    `
+      <form id="transaction-form">
+        ${isEdit ? `<input type="hidden" name="id" value="${transaction.id}">` : ''}
+        
+        <div class="form-group">
+          <label>Descripció *</label>
+          <input type="text" name="description" required value="${isEdit ? transaction.description || '' : ''}" placeholder="Ex: Compra al supermercat">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Import (€) *</label>
+            <input type="number" name="amount" step="0.01" min="0.01" required value="${isEdit ? transaction.amount : ''}">
+          </div>
+          <div class="form-group">
+            <label>Data *</label>
+            <input type="date" name="date" required value="${dateStr}">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipus *</label>
+            <select name="type" id="type-select" required>
+              <option value="expense" ${initialType === 'expense' ? 'selected' : ''}>Despesa</option>
+              <option value="income" ${initialType === 'income' ? 'selected' : ''}>Ingrés</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Categoria *</label>
+            <select name="categoryId" id="category-select" required>
+              <option value="">Selecciona...</option>
+              ${getCategoryOptions(initialType)}
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Percentatge a comptabilitzar</label>
+          <div class="percentage-control">
+            <input type="range" id="pct-slider" min="1" max="100" value="${percentage}">
+            <input type="number" name="accountingPercentage" id="pct-input" min="1" max="100" value="${percentage}">
+            <span>%</span>
+          </div>
+          <small id="pct-hint"></small>
+        </div>
+        
+        <input type="hidden" name="accountId" value="${isEdit ? transaction.accountId || 1 : 1}">
+        
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel·lar</button>
+          <button type="submit" class="btn btn-primary">${isEdit ? 'Actualitzar' : 'Guardar'}</button>
+        </div>
+      </form>
+    </div>
+  `
 
     document.body.appendChild(modal)
+
+    // Event listener per actualitzar categories quan canvia el tipus
+    const typeSelect = document.getElementById('type-select')
+    const categorySelect = document.getElementById('category-select')
+
+    typeSelect.addEventListener('change', e => {
+      const selectedType = e.target.value
+      const currentCategoryId = categorySelect.value
+
+      // Actualitzar opcions de categoria
+      categorySelect.innerHTML = `
+      <option value="">Selecciona...</option>
+      ${getCategoryOptions(selectedType)}
+    `
+
+      // Si estem editant i la categoria actual encara és vàlida per aquest tipus, mantenir-la seleccionada
+      if (isEdit && currentCategoryId) {
+        const currentCategory = this.categories.find(c => c.id === parseInt(currentCategoryId))
+        if (currentCategory && currentCategory.type === selectedType) {
+          categorySelect.value = currentCategoryId
+        }
+      }
+    })
 
     // Sincronitzar slider i input
     const slider = document.getElementById('pct-slider')
