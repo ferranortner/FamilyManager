@@ -35,3 +35,4 @@ C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\FinanceA
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\FinanceApp.API.genruntimeconfig.cache
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\ref\FinanceApp.API.dll
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\bin\Debug\net9.0\Data\events.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.API\obj\Debug\net9.0\swae.build.ex.cache

@@ -1,31 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PEsoTtFvoFY=",
+  "dgSpecHash": "vFuUf6mSgMg=",
   "success": true,
   "projectFilePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.Core\\Models\\FinanceApp.Core.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.28\\microsoft.netcore.app.ref.8.0.28.nupkg.sha512",
-    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.28\\microsoft.windowsdesktop.app.ref.8.0.28.nupkg.sha512",
-    "C:\\Users\\f.ortner.CORP\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.28\\microsoft.aspnetcore.app.ref.8.0.28.nupkg.sha512"
-  ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://nuget-pro-v2.winsysgroup.com:8443/v3/index.json.",
-      "projectPath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.Core\\Models\\FinanceApp.Core.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.Core\\Models\\FinanceApp.Core.csproj",
-      "targetGraphs": []
-    },
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://nuget-pre-v2.winsysgroup.com:8443/v3/index.json.",
-      "projectPath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.Core\\Models\\FinanceApp.Core.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.Core\\Models\\FinanceApp.Core.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "expectedPackageFiles": [],
+  "logs": []
 }

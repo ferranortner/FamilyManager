@@ -28,3 +28,4 @@ C:\OLD_DATA\Proyectos\FamilyManager\src\FinancesApp.Web\obj\Debug\net8.0\Finance
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinancesApp.Web\obj\Debug\net8.0\ref\FinancesApp.Web.dll
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinancesApp.Web\bin\Debug\net8.0\FinancesApp.Web.staticwebassets.runtime.json
 C:\OLD_DATA\Proyectos\FamilyManager\src\FinancesApp.Web\obj\Debug\net8.0\FinancesApp.Web.sourcelink.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinancesApp.Web\obj\Debug\net8.0\swae.build.ex.cache

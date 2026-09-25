@@ -10,70 +10,91 @@ export class CategoriesManager {
 
   async render() {
     this.container.innerHTML = `
-      <div class="categories-header">
-        <h2></h2>
-        <button id="btn-new-category" class="btn btn-primary">+ Nova Categoria</button>
+      <div class="page-header">
+        <div class="page-header-text">
+          <h1 class="page-title">
+            <i class="material-icons" style="vertical-align: middle; margin-right: 8px;">category</i>
+            Gestió de Categories
+          </h1>
+          <p class="page-subtitle">Configura les categories d'ingressos i despeses per organitzar i analitzar les teves finances.</p>
+        </div>
+        <div class="page-actions">
+          <button id="btn-new-category" class="btn-app btn-app-primary">
+            <i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">add</i>
+            Nova Categoria
+          </button>
+        </div>
       </div>
 
-      <div id="category-form-container" class="form-container hidden">
-        <h3 id="form-title">Nova Categoria</h3>
-        <form id="category-form">
-          <div class="form-group">
-            <label>Nom</label>
-            <input type="text" id="cat-name" required placeholder="Ex: Compres, Nòmina...">
-          </div>
-
-          <div class="form-row">
+      <div id="category-form-container" class="card hidden" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <h3 id="form-title" class="card-title">Nova Categoria</h3>
+        </div>
+        <div class="card-body">
+          <form id="category-form">
             <div class="form-group">
-              <label>Tipus</label>
-              <select id="cat-type" required>
-                <option value="expense">Despesa</option>
-                <option value="income">Ingressos</option>
-              </select>
+              <label class="form-label" for="cat-name">Nom de la categoria</label>
+              <input type="text" id="cat-name" class="form-control" required placeholder="Ex: Supermercat, Nòmina, Oci...">
+            </div>
+
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="cat-type">Tipus</label>
+                <select id="cat-type" class="form-select" required>
+                  <option value="expense">Despesa</option>
+                  <option value="income">Ingrés</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cat-color">Color identificatiu</label>
+                <input type="color" id="cat-color" class="form-control" value="#6b7280" style="height: 42px; padding: 4px;">
+              </div>
             </div>
 
             <div class="form-group">
-              <label>Color</label>
-              <input type="color" id="cat-color" value="#6b7280">
-            </div>
-          </div>
+              <label class="form-label">Icona o Imatge</label>
+              <div class="icon-selector">
+                <div class="icon-tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+                  <button type="button" class="btn-app btn-app-secondary icon-tab active" data-tab="emoji" style="font-size: 0.875rem;">
+                    <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">emoji_emotions</i> Emoji
+                  </button>
+                  <button type="button" class="btn-app btn-app-secondary icon-tab" data-tab="image" style="font-size: 0.875rem;">
+                    <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">image</i> Imatge
+                  </button>
+                </div>
 
-          <div class="form-group">
-            <label>Icona</label>
-            <div class="icon-selector">
-              <div class="icon-tabs">
-                <button type="button" class="icon-tab active" data-tab="emoji">Emoji</button>
-                <button type="button" class="icon-tab" data-tab="image">Imatge</button>
-              </div>
+                <div class="icon-content" id="emoji-content">
+                  <input type="text" id="cat-icon" class="form-control" placeholder="Ex: 🛒 💰 🚗" maxlength="2" style="max-width: 100px; font-size: 1.5rem; text-align: center;">
+                  <p class="form-text" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Fes clic per seleccionar un emoji o escriu-lo directament.</p>
+                </div>
 
-              <div class="icon-content" id="emoji-content">
-                <input type="text" id="cat-icon" placeholder="Ex: 🛒 💰 🚗" maxlength="2">
-                <small>Fes clic per seleccionar emoji o escriu-lo directament</small>
-              </div>
-
-              <div class="icon-content hidden" id="image-content">
-                <div class="image-upload-area" id="image-upload-area">
-                  <input type="file" id="cat-image" accept="image/*" hidden>
-                  <div class="upload-placeholder" id="upload-placeholder">
-                    <span class="upload-icon">📷</span>
-                    <span class="upload-text">Arrossega una imatge o fes clic per seleccionar</span>
-                    <span class="upload-hint">PNG, JPG, GIF (màx. 2MB)</span>
+                <div class="icon-content hidden" id="image-content">
+                  <div class="image-upload-area" id="image-upload-area" style="border: 2px dashed var(--border-color); border-radius: var(--radius-md); padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                    <input type="file" id="cat-image" accept="image/*" hidden>
+                    <div class="upload-placeholder" id="upload-placeholder">
+                      <i class="material-icons" style="font-size: 32px; color: var(--text-muted); margin-bottom: 8px;">cloud_upload</i>
+                      <p style="margin: 0; font-weight: 500; color: var(--text-color);">Arrossega una imatge o fes clic per seleccionar</p>
+                      <p class="form-text" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">PNG, JPG, GIF (màx. 2MB)</p>
+                    </div>
+                    <img id="image-preview" class="image-preview hidden" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: var(--radius-sm); margin: 0 auto; display: block;">
+                    <button type="button" id="remove-image" class="btn-app btn-app-ghost btn-app-sm hidden" style="margin-top: 8px; color: var(--result-error-text);">
+                      <i class="material-icons" style="font-size: 16px; vertical-align: middle;">delete</i> Eliminar imatge
+                    </button>
                   </div>
-                  <img id="image-preview" class="image-preview hidden" alt="Preview">
-                  <button type="button" id="remove-image" class="btn-remove-image hidden">✕</button>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="form-actions">
-            <button type="button" id="btn-cancel" class="btn btn-secondary">Cancel·lar</button>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </div>
-        </form>
+            <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+              <button type="button" id="btn-cancel" class="btn-app btn-app-secondary">Cancel·lar</button>
+              <button type="submit" class="btn-app btn-app-primary">Guardar Categoria</button>
+            </div>
+          </form>
+        </div>
       </div>
 
-      <div class="categories-grid" id="categories-list">
+      <div id="categories-list" class="categories-grid">
         ${await this.renderCategoriesList()}
       </div>
     `
@@ -88,8 +109,10 @@ export class CategoriesManager {
       if (this.categories.length === 0) {
         return `
           <div class="empty-state">
-            <p>No hi ha categories. Crea la primera!</p>
-            <button onclick="document.getElementById('btn-new-category').click()" class="btn btn-primary">
+            <i class="material-icons empty-state-icon">category</i>
+            <h3 class="empty-state-title">No hi ha categories</h3>
+            <p>Crea la teva primera categoria per començar a organitzar les teves finances.</p>
+            <button onclick="document.getElementById('btn-new-category').click()" class="btn-app btn-app-primary" style="margin-top: 16px;">
               Crear categoria
             </button>
           </div>
@@ -100,41 +123,75 @@ export class CategoriesManager {
       const expenseCats = this.categories.filter(c => c.type === 'expense')
 
       return `
-        <div class="category-section">
-          <h4>💰 Ingressos</h4>
-          <div class="category-list">
+        ${
+          incomeCats.length > 0
+            ? `
+        <div class="category-section" style="margin-bottom: 32px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <i class="material-icons" style="color: var(--result-success-text);">trending_up</i>
+            <h4 style="margin: 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Ingressos</h4>
+          </div>
+          <div class="category-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
             ${incomeCats.map(c => this.renderCategoryCard(c)).join('')}
           </div>
         </div>
+        `
+            : ''
+        }
 
+        ${
+          expenseCats.length > 0
+            ? `
         <div class="category-section">
-          <h4>💸 Despeses</h4>
-          <div class="category-list">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <i class="material-icons" style="color: var(--result-error-text);">trending_down</i>
+            <h4 style="margin: 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Despeses</h4>
+          </div>
+          <div class="category-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
             ${expenseCats.map(c => this.renderCategoryCard(c)).join('')}
           </div>
         </div>
+        `
+            : ''
+        }
       `
     } catch (error) {
-      return `<div class="error">Error carregant categories: ${error.message}</div>`
+      return `
+        <div class="empty-state">
+          <i class="material-icons empty-state-icon" style="color: var(--result-error-text);">error</i>
+          <h3 class="empty-state-title">Error de connexió</h3>
+          <p>No s'han pogut carregar les categories: ${error.message}</p>
+        </div>
+      `
     }
   }
 
   renderCategoryCard(category) {
     const hasImage = category.imageUrl || category.imageData
-    const iconDisplay = hasImage ? `<img src="${category.imageUrl || category.imageData}" alt="${category.name}" class="category-img">` : `<span class="category-emoji">${category.icon || '📁'}</span>`
+    const iconDisplay = hasImage
+      ? `<img src="${category.imageUrl || category.imageData}" alt="${category.name}" style="width: 32px; height: 32px; object-fit: cover; border-radius: var(--radius-sm);">`
+      : `<span style="font-size: 1.5rem;">${category.icon || '📁'}</span>`
+
+    const badgeClass = category.type === 'income' ? 'badge-app-success' : 'badge-app-danger'
+    const badgeText = category.type === 'income' ? 'Ingrés' : 'Despesa'
 
     return `
-      <div class="category-card" data-id="${category.id}">
-        <div class="category-icon-wrapper" style="background: ${category.color}20; color: ${category.color}">
-          ${iconDisplay}
+      <div class="card category-card" data-id="${category.id}" style="position: relative; transition: transform 0.2s, box-shadow 0.2s; cursor: default;">
+        <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;" class="category-actions">
+          <button class="btn-app btn-app-ghost btn-app-sm btn-icon-action edit" data-id="${category.id}" title="Editar" style="color: var(--text-muted); padding: 4px;">
+            <i class="material-icons" style="font-size: 18px;">edit</i>
+          </button>
+          <button class="btn-app btn-app-ghost btn-app-sm btn-icon-action delete" data-id="${category.id}" title="Eliminar" style="color: var(--result-error-text); padding: 4px;">
+            <i class="material-icons" style="font-size: 18px;">delete</i>
+          </button>
         </div>
-        <div class="category-details">
-          <span class="category-name">${category.name}</span>
-          <span class="category-meta">${category.type === 'income' ? 'Ingressos' : 'Despeses'}</span>
-        </div>
-        <div class="category-actions">
-          <button class="btn-icon edit" data-id="${category.id}" title="Editar">✏️</button>
-          <button class="btn-icon delete" data-id="${category.id}" title="Eliminar">🗑️</button>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px;">
+          <div style="width: 56px; height: 56px; border-radius: var(--radius-md); background: ${category.color}20; color: ${category.color}; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid ${category.color}40;">
+            ${iconDisplay}
+          </div>
+          <h5 style="margin: 0 0 8px 0; font-size: 1rem; font-weight: 600; color: var(--text-color); word-break: break-word;">${category.name}</h5>
+          <span class="badge-app ${badgeClass}" style="font-size: 0.7rem;">${badgeText}</span>
         </div>
       </div>
     `
@@ -146,7 +203,7 @@ export class CategoriesManager {
     document.getElementById('category-form')?.addEventListener('submit', e => this.handleSubmit(e))
 
     document.querySelectorAll('.icon-tab').forEach(tab => {
-      tab.addEventListener('click', e => this.switchIconTab(e.target.dataset.tab))
+      tab.addEventListener('click', e => this.switchIconTab(e.target.closest('.icon-tab').dataset.tab))
     })
 
     const uploadArea = document.getElementById('image-upload-area')
@@ -154,23 +211,26 @@ export class CategoriesManager {
     const removeBtn = document.getElementById('remove-image')
 
     uploadArea?.addEventListener('click', e => {
-      if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
+      if (e.target !== removeBtn && !removeBtn.contains(e.target) && !e.target.closest('#remove-image')) {
         fileInput?.click()
       }
     })
 
     uploadArea?.addEventListener('dragover', e => {
       e.preventDefault()
-      uploadArea.classList.add('dragover')
+      uploadArea.style.borderColor = 'var(--primary-color)'
+      uploadArea.style.background = 'var(--bg-color)'
     })
 
     uploadArea?.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('dragover')
+      uploadArea.style.borderColor = 'var(--border-color)'
+      uploadArea.style.background = 'transparent'
     })
 
     uploadArea?.addEventListener('drop', e => {
       e.preventDefault()
-      uploadArea.classList.remove('dragover')
+      uploadArea.style.borderColor = 'var(--border-color)'
+      uploadArea.style.background = 'transparent'
       const files = e.dataTransfer.files
       if (files.length > 0) {
         this.handleImageSelect(files[0])
@@ -188,12 +248,31 @@ export class CategoriesManager {
       this.removeImage()
     })
 
-    document.getElementById('categories-list')?.addEventListener('click', async e => {
-      const btn = e.target.closest('.btn-icon')
+    // Delegació d'esdeveniments per a les targetes
+    const listContainer = document.getElementById('categories-list')
+    listContainer?.addEventListener(
+      'mouseenter',
+      e => {
+        const card = e.target.closest('.category-card')
+        if (card) card.querySelector('.category-actions').style.opacity = '1'
+      },
+      true
+    )
+
+    listContainer?.addEventListener(
+      'mouseleave',
+      e => {
+        const card = e.target.closest('.category-card')
+        if (card) card.querySelector('.category-actions').style.opacity = '0'
+      },
+      true
+    )
+
+    listContainer?.addEventListener('click', async e => {
+      const btn = e.target.closest('.btn-icon-action')
       if (!btn) return
 
       const id = parseInt(btn.dataset.id)
-
       if (btn.classList.contains('edit')) {
         await this.editCategory(id)
       } else if (btn.classList.contains('delete')) {
@@ -203,20 +282,28 @@ export class CategoriesManager {
   }
 
   switchIconTab(tab) {
-    document.querySelectorAll('.icon-tab').forEach(t => t.classList.remove('active'))
-    document.querySelector(`.icon-tab[data-tab="${tab}"]`)?.classList.add('active')
+    document.querySelectorAll('.icon-tab').forEach(t => {
+      t.classList.remove('active', 'btn-app-primary')
+      t.classList.add('btn-app-secondary')
+    })
+    const activeTab = document.querySelector(`.icon-tab[data-tab="${tab}"]`)
+    if (activeTab) {
+      activeTab.classList.add('active', 'btn-app-primary')
+      activeTab.classList.remove('btn-app-secondary')
+    }
+
     document.getElementById('emoji-content')?.classList.toggle('hidden', tab !== 'emoji')
     document.getElementById('image-content')?.classList.toggle('hidden', tab !== 'image')
   }
 
   handleImageSelect(file) {
     if (!file.type.startsWith('image/')) {
-      alert('Si us plau, selecciona un arxiu imatge vàlid')
+      alert("Si us plau, selecciona un arxiu d'imatge vàlid.")
       return
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('La imatge és massa gran. Màxim 2MB.')
+      alert('La imatge és massa gran. El màxim permès és 2MB.')
       return
     }
 
@@ -259,6 +346,9 @@ export class CategoriesManager {
 
     container.classList.remove('hidden')
     title.textContent = category ? 'Editar Categoria' : 'Nova Categoria'
+
+    // Scroll suau cap al formulari
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
     this.selectedImage = null
     this.removeImage()
@@ -321,7 +411,7 @@ export class CategoriesManager {
       this.hideForm()
       await this.refreshList()
     } catch (error) {
-      alert('Error guardant: ' + error.message)
+      alert('Error guardant la categoria: ' + error.message)
     }
   }
 
@@ -333,13 +423,13 @@ export class CategoriesManager {
   }
 
   async deleteCategory(id) {
-    if (!confirm('Segur que vols eliminar aquesta categoria?')) return
+    if (!confirm('Segur que vols eliminar aquesta categoria? Aquesta acció no es pot desfer.')) return
 
     try {
       await categoryService.delete(id)
       await this.refreshList()
     } catch (error) {
-      alert('Error eliminant: ' + error.message)
+      alert('Error eliminant la categoria: ' + error.message)
     }
   }
 

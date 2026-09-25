@@ -287,6 +287,15 @@
       "icon": "\uD83D\uDCB3",
       "isActive": true,
       "createdAt": "2026-03-25T17:46:58.4176722Z"
+    },
+    {
+      "id": 33,
+      "name": "Gen\u00E8rica",
+      "type": "expense",
+      "color": "#1251ce",
+      "icon": "\uD83D\uDC53",
+      "isActive": true,
+      "createdAt": "2026-09-25T11:27:06.8505145Z"
     }
   ]
 }

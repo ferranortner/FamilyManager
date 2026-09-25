@@ -9,6 +9,7 @@ import { EventManager } from './components/eventManager.js'
 import { AnalysisPage } from './components/analysis.js'
 import { TransactionGroups } from './components/TransactionGroups.js'
 import { CategorySummary } from './components/CategorySummary.js'
+import { ForecastView } from './components/forecast.js'
 
 // ===== GESTIÓ DE TEMES (GLOBAL AMB DELEGACIÓ D'ESDEVENIMENTS) =====
 function initThemeSelector() {
@@ -166,6 +167,11 @@ class App {
         title.textContent = 'Resum de Categories'
         const categorySummary = new CategorySummary('main-content')
         categorySummary.render()
+        break
+      case 'forecast':
+        title.textContent = 'Previsió de Pagaments' // ← Afegit per consistència
+        const forecastView = new ForecastView()
+        await forecastView.render() // ← Afegit 'await' per si hi ha càrrega asíncrona
         break
       default:
         title.textContent = 'Dashboard'

@@ -69,6 +69,26 @@
       "notes": "11",
       "createdAt": "2026-04-08T11:22:26.4086566Z",
       "updatedAt": null
+    },
+    {
+      "id": 8,
+      "title": "Santa Merc\u00E8",
+      "type": "reminder",
+      "date": "2026-09-24",
+      "isRecurring": true,
+      "notes": null,
+      "createdAt": "2026-09-25T11:51:25.2381051Z",
+      "updatedAt": null
+    },
+    {
+      "id": 9,
+      "title": "Aniversari Jordi",
+      "type": "birthday",
+      "date": "2026-09-26",
+      "isRecurring": true,
+      "notes": "53",
+      "createdAt": "2026-09-25T13:16:12.2631142Z",
+      "updatedAt": "2026-09-25T13:16:38.0435778Z"
     }
   ]
 }
