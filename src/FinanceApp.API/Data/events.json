@@ -89,6 +89,36 @@
       "notes": "53",
       "createdAt": "2026-09-25T13:16:12.2631142Z",
       "updatedAt": "2026-09-25T13:16:38.0435778Z"
+    },
+    {
+      "id": 10,
+      "title": "Reuni\u00F3 express - Dolors Polonio 17:40 - N\u00FAria",
+      "type": "reminder",
+      "date": "2026-09-29",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-09-29T13:11:55.8665649Z",
+      "updatedAt": null
+    },
+    {
+      "id": 11,
+      "title": "Reuni\u00F3 express - Gemma Sanz 18:00",
+      "type": "reminder",
+      "date": "2026-09-15",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-09-29T13:12:41.2615478Z",
+      "updatedAt": "2026-09-29T13:13:25.2615082Z"
+    },
+    {
+      "id": 12,
+      "title": "Reuni\u00F3 express - Victoria Torras - 18:25",
+      "type": "reminder",
+      "date": "2026-10-01",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-09-29T13:13:20.530839Z",
+      "updatedAt": null
     }
   ]
 }

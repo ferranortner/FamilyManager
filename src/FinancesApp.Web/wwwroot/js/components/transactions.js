@@ -12,16 +12,19 @@ export class TransactionManager {
     this.sortDirection = 'desc'
     this.selectedCategory = 'all'
 
-    // NOU: Estat per ocultar transaccions futures
-    this.hideFutureTransactions = false
+    // NOU: Estat per ocultar transaccions futures (activat per defecte)
+    this.hideFutureTransactions = true
+
+    // NOU: Estat per als nous filtres
+    this.searchQuery = ''
+    this.selectedMonth = 'all'
+    this.selectedYear = new Date().getFullYear().toString() // Any actual per defecte
 
     // NOU: Carregar plantilles del localStorage o usar les per defecte
     const defaultTemplates = [
       { id: 'rent', label: '🏠 Lloguer', description: 'Lloguer {mes}', amount: 1176, type: 'expense', categoryName: 'Lloguer' },
-      { id: 'loan', label: '🏦 Crèdit / Préstec', description: 'Quota crèdit 1 {mes}', amount: 101, type: 'expense', categoryName: 'Préstecs' },
       { id: 'internet', label: '🌐 Internet / Telèfon', description: 'Internet {mes}', amount: 73.5, type: 'expense', categoryName: 'Serveis' },
       { id: 'salary', label: '💼 Nòmina / Sou', description: 'Nòmina {mes}', amount: 2500, type: 'income', categoryName: 'Sou' },
-      { id: 'loan', label: '🏦 Crèdit / Préstec', description: 'Quota crèdit 2 {mes}', amount: 101, type: 'expense', categoryName: 'Préstecs' },
       { id: 'loan', label: '🏦 Crèdit / Préstec', description: 'Quota Ikea {mes}', amount: 50, type: 'expense', categoryName: 'Préstecs' },
     ]
     this.templates = JSON.parse(localStorage.getItem('fm_templates')) || defaultTemplates
@@ -37,41 +40,74 @@ export class TransactionManager {
       this.categories = []
     }
 
+    // Generar opcions de mesos en català
+    const months = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre']
+    const monthOptions =
+      `<option value="all">Tots els mesos</option>` +
+      months.map((m, i) => `<option value="${String(i + 1).padStart(2, '0')}" ${this.selectedMonth === String(i + 1).padStart(2, '0') ? 'selected' : ''}>${m}</option>`).join('')
+
+    // Generar opcions d'anys (actual - 5 fins a actual + 1)
+    const currentYear = new Date().getFullYear()
+    const years = Array.from({ length: 7 }, (_, i) => currentYear - 5 + i)
+    const yearOptions = `<option value="all">Tots els anys</option>` + years.map(y => `<option value="${y}" ${this.selectedYear === String(y) ? 'selected' : ''}>${y}</option>`).join('')
+
     this.container.innerHTML = `
       <div class="transactions-page">
         <div class="page-header-compact">
-          <div class="header-controls">
+          <div class="header-controls" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+            
+            <!-- NOU: Filtres de Text, Mes i Any -->
+            <div class="control-group">
+              <label for="search-input">Cercar</label>
+              <input type="text" id="search-input" placeholder="Descripció..." value="${this.searchQuery}" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px;">
+            </div>
+
+            <div class="control-group">
+              <label for="month-filter">Mes</label>
+              <select id="month-filter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                ${monthOptions}
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="year-filter">Any</label>
+              <select id="year-filter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                ${yearOptions}
+              </select>
+            </div>
+
+            <!-- Filtres existents -->
             <div class="control-group">
               <label for="category-filter">Categoria</label>
-              <select id="category-filter">
+              <select id="category-filter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
                 <option value="all">Totes</option>
-                ${this.categories.map(c => `<option value="${c.id}">${c.icon || '•'} ${c.name}</option>`).join('')}
+                ${this.categories.map(c => `<option value="${c.id}" ${this.selectedCategory === String(c.id) ? 'selected' : ''}>${c.icon || '•'} ${c.name}</option>`).join('')}
               </select>
             </div>
 
             <div class="control-group">
               <label for="sort-field">Ordenar</label>
-              <div class="sort-wrapper">
-                <select id="sort-field">
-                  <option value="date" selected>Data</option>
-                  <option value="amount">Import</option>
+              <div class="sort-wrapper" style="display: flex; gap: 4px;">
+                <select id="sort-field" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                  <option value="date" ${this.sortField === 'date' ? 'selected' : ''}>Data</option>
+                  <option value="amount" ${this.sortField === 'amount' ? 'selected' : ''}>Import</option>
                 </select>
-                <button id="sort-direction" class="btn-sort" title="Canviar direcció">
-                  <span id="sort-icon">↓</span>
+                <button id="sort-direction" class="btn-sort" title="Canviar direcció" style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer;">
+                  <span id="sort-icon">${this.sortDirection === 'desc' ? '↓' : '↑'}</span>
                 </button>
               </div>
             </div>
 
-            <!-- NOU: Checkbox per ocultar futures -->
+            <!-- NOU: Checkbox per ocultar futures (marcat per defecte) -->
             <div class="control-group" style="display: flex; align-items: flex-end; padding-bottom: 4px;">
-              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9em; user-select: none;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9em; user-select: none; white-space: nowrap;">
                 <input type="checkbox" id="hide-future-cb" ${this.hideFutureTransactions ? 'checked' : ''}>
                 Ocultar futures
               </label>
             </div>
 
-            <!-- NOU: Botons d'acció ràpida -->
-            <div class="quick-actions" style="display: flex; gap: 8px;">
+            <!-- Botons d'acció ràpida -->
+            <div class="quick-actions" style="display: flex; gap: 8px; margin-left: auto;">
               <button class="btn btn-secondary" id="manage-templates-btn" title="Editar plantilles base">⚙️ Plantilles</button>
               <button class="btn btn-secondary" id="templates-btn" title="Usar plantilla periòdica">📋 Nova des de Plantilla</button>
               <button class="btn btn-primary" id="add-btn">+ Nova</button>
@@ -86,7 +122,23 @@ export class TransactionManager {
       </div>
     `
 
-    // Event listeners
+    // Event listeners nous
+    document.getElementById('search-input').addEventListener('input', e => {
+      this.searchQuery = e.target.value
+      this.applyFilters()
+    })
+
+    document.getElementById('month-filter').addEventListener('change', e => {
+      this.selectedMonth = e.target.value
+      this.applyFilters()
+    })
+
+    document.getElementById('year-filter').addEventListener('change', e => {
+      this.selectedYear = e.target.value
+      this.applyFilters()
+    })
+
+    // Event listeners existents
     document.getElementById('add-btn').addEventListener('click', () => this.openModal())
     document.getElementById('templates-btn').addEventListener('click', () => this.openTemplatePicker())
     document.getElementById('manage-templates-btn').addEventListener('click', () => this.openTemplateManager())
@@ -115,7 +167,6 @@ export class TransactionManager {
     await this.loadTransactions()
   }
 
-  // NOU: Gestor per editar les plantilles base
   openTemplateManager() {
     const modal = document.createElement('div')
     modal.className = 'modal-overlay'
@@ -159,14 +210,12 @@ export class TransactionManager {
     `
     document.body.appendChild(modal)
 
-    // Afegir nova plantilla buida
     document.getElementById('add-tmpl-btn').addEventListener('click', () => {
       this.templates.push({ id: 'custom_' + Date.now(), label: 'Nova', description: 'Concepte {mes}', amount: 0, type: 'expense', categoryName: '' })
-      this.openTemplateManager() // Re-renderitzar
+      this.openTemplateManager()
       modal.remove()
     })
 
-    // Eliminar plantilla
     modal.querySelectorAll('.btn-delete-tmpl').forEach(btn => {
       btn.addEventListener('click', () => {
         this.templates.splice(parseInt(btn.dataset.idx), 1)
@@ -175,7 +224,6 @@ export class TransactionManager {
       })
     })
 
-    // Desar canvis
     document.getElementById('save-templates-btn').addEventListener('click', () => {
       const updatedTemplates = this.templates.map((t, i) => ({
         ...t,
@@ -291,9 +339,31 @@ export class TransactionManager {
   }
 
   applyFilters() {
-    let filtered = this.selectedCategory === 'all' ? [...this.transactions] : this.transactions.filter(t => t.categoryId === parseInt(this.selectedCategory))
+    let filtered = [...this.transactions]
 
-    // NOU: Filtrar transaccions futures si el checkbox està activat
+    if (this.selectedCategory !== 'all') {
+      filtered = filtered.filter(t => t.categoryId === parseInt(this.selectedCategory))
+    }
+
+    if (this.searchQuery.trim() !== '') {
+      const query = this.searchQuery.toLowerCase().trim()
+      filtered = filtered.filter(t => (t.description || '').toLowerCase().includes(query))
+    }
+
+    if (this.selectedMonth !== 'all') {
+      filtered = filtered.filter(t => {
+        const txMonth = String(new Date(t.date).getMonth() + 1).padStart(2, '0')
+        return txMonth === this.selectedMonth
+      })
+    }
+
+    if (this.selectedYear !== 'all') {
+      filtered = filtered.filter(t => {
+        const txYear = String(new Date(t.date).getFullYear())
+        return txYear === this.selectedYear
+      })
+    }
+
     if (this.hideFutureTransactions) {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
@@ -309,11 +379,11 @@ export class TransactionManager {
     this.renderSortedTransactions()
   }
 
-  // ... (updateSummary, calculateEffectiveAmount, sortTransactions es mantenen igual) ...
   updateSummary() {
     const summaryEl = document.getElementById('transactions-summary')
     if (!summaryEl) return
     const count = this.filteredTransactions.length
+
     if (this.selectedCategory !== 'all') {
       const category = this.categories.find(c => c.id === parseInt(this.selectedCategory))
       const total = this.filteredTransactions.reduce((sum, t) => {
@@ -361,7 +431,7 @@ export class TransactionManager {
 
     listContainer.innerHTML = sortedTransactions.map(t => this.renderTransactionItem(t)).join('')
 
-    listContainer.querySelectorAll('.transaction-item').forEach(item => {
+    listContainer.querySelectorAll('.transaction-item-compact').forEach(item => {
       item.addEventListener('click', e => {
         if (e.target.closest('.btn-delete') || e.target.closest('.btn-edit')) return
         this.openEditModal(item.dataset.id)
@@ -410,6 +480,7 @@ export class TransactionManager {
     this.openTransactionModal(transaction)
   }
 
+  // ✅ MODIFICAT: Dropdown cercable amb navegació per teclat i auto-selecció
   openTransactionModal(transaction = null, template = null) {
     const isEdit = transaction !== null
     const isTemplate = template !== null && !isEdit
@@ -418,16 +489,6 @@ export class TransactionManager {
     if (this.categories.length === 0) {
       alert('No hi ha categories disponibles.')
       return
-    }
-
-    const getCategoryOptions = (type, selectedId = null) => {
-      const filteredCategories = this.categories.filter(c => c.type === type)
-      return filteredCategories
-        .map(c => {
-          const selected = selectedId && c.id === selectedId ? 'selected' : ''
-          return `<option value="${c.id}" ${selected}>${c.icon || '•'} ${c.name}</option>`
-        })
-        .join('')
     }
 
     const percentage = isEdit ? transaction.accountingPercentage || 100 : 100
@@ -449,6 +510,12 @@ export class TransactionManager {
       initialAmount = template.amount
       const matchedCategory = this.categories.find(c => c.name.toLowerCase() === template.categoryName.toLowerCase())
       initialCategoryId = matchedCategory ? matchedCategory.id : ''
+    }
+
+    let initialCategoryDisplay = ''
+    if (initialCategoryId) {
+      const cat = this.categories.find(c => c.id === parseInt(initialCategoryId))
+      if (cat) initialCategoryDisplay = `${cat.icon || '•'} ${cat.name}`
     }
 
     const modal = document.createElement('div')
@@ -483,12 +550,17 @@ export class TransactionManager {
               <option value="income" ${initialType === 'income' ? 'selected' : ''}>Ingrés</option>
             </select>
           </div>
-          <div class="form-group">
+          
+          <!-- ✅ Dropdown cercable avançat -->
+          <div class="form-group category-dropdown-wrapper" style="position: relative;">
             <label>Categoria *</label>
-            <select name="categoryId" id="category-select" required>
-              <option value="">Selecciona...</option>
-              ${getCategoryOptions(initialType, initialCategoryId)}
-            </select>
+            <input type="text" id="category-search-input" placeholder="Escriu per filtrar..." 
+                   value="${initialCategoryDisplay}" autocomplete="off"
+                   style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+            <input type="hidden" name="categoryId" id="category-hidden-input" required value="${initialCategoryId}">
+            <div id="category-dropdown-list" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-radius: 4px; max-height: 200px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 4px;">
+            </div>
+            <small id="category-error" style="color: #e74c3c; display: none; margin-top: 4px;">⚠️ Has de seleccionar una categoria de la llista</small>
           </div>
         </div>
         <div class="form-group">
@@ -510,12 +582,155 @@ export class TransactionManager {
 
     document.body.appendChild(modal)
 
+    // Variables d'estat per al dropdown
+    let highlightedIndex = -1
+    let currentFilteredCategories = []
+
+    const categorySearchInput = document.getElementById('category-search-input')
+    const categoryHiddenInput = document.getElementById('category-hidden-input')
+    const categoryDropdownList = document.getElementById('category-dropdown-list')
+    const categoryError = document.getElementById('category-error')
     const typeSelect = document.getElementById('type-select')
-    const categorySelect = document.getElementById('category-select')
-    typeSelect.addEventListener('change', e => {
-      categorySelect.innerHTML = `<option value="">Selecciona...</option>${getCategoryOptions(e.target.value, categorySelect.value)}`
+
+    let currentType = initialType
+
+    // Funció per seleccionar una categoria (actualitza inputs i tanca dropdown)
+    const selectCategory = category => {
+      categoryHiddenInput.value = category.id
+      categorySearchInput.value = `${category.icon || '•'} ${category.name}`
+      categoryDropdownList.style.display = 'none'
+      categoryError.style.display = 'none'
+      categorySearchInput.style.borderColor = '#ccc'
+      highlightedIndex = -1
+    }
+
+    // Funció per renderitzar la llista filtrada
+    const renderCategoryOptions = (filterText = '') => {
+      currentFilteredCategories = this.categories.filter(c => {
+        const matchesType = c.type === currentType
+        const matchesText = c.name.toLowerCase().includes(filterText.toLowerCase())
+        return matchesType && matchesText
+      })
+
+      // Si només queda 1 opció, la seleccionem automàticament!
+      if (currentFilteredCategories.length === 1 && filterText.length > 0) {
+        selectCategory(currentFilteredCategories[0])
+        return
+      }
+
+      if (currentFilteredCategories.length === 0) {
+        categoryDropdownList.innerHTML = '<div style="padding: 10px; color: #666; text-align: center; font-size: 0.9em;">Cap resultat trobat</div>'
+        highlightedIndex = -1
+      } else {
+        highlightedIndex = 0 // Comencem destacant la primera opció
+        categoryDropdownList.innerHTML = currentFilteredCategories
+          .map(
+            (c, index) => `
+          <div class="cat-option" data-index="${index}" data-id="${c.id}" data-name="${c.name}" data-icon="${c.icon || '•'}" 
+               style="padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0f0f0; transition: background 0.1s; background-color: ${index === 0 ? '#e0f2fe' : 'transparent'};">
+            <span>${c.icon || '•'}</span>
+            <span>${c.name}</span>
+          </div>
+        `
+          )
+          .join('')
+
+        // Events de clic a cada opció
+        categoryDropdownList.querySelectorAll('.cat-option').forEach(item => {
+          item.addEventListener('click', () => {
+            const idx = parseInt(item.dataset.index)
+            selectCategory(currentFilteredCategories[idx])
+          })
+          item.addEventListener('mouseenter', () => {
+            // Actualitzar highlight al passar el ratolí
+            highlightedIndex = parseInt(item.dataset.index)
+            updateHighlight()
+          })
+        })
+      }
+    }
+
+    // Actualitzar visualment l'element ressaltat
+    const updateHighlight = () => {
+      const options = categoryDropdownList.querySelectorAll('.cat-option')
+      options.forEach((opt, idx) => {
+        if (idx === highlightedIndex) {
+          opt.style.backgroundColor = '#e0f2fe' // Blau clar
+          opt.scrollIntoView({ block: 'nearest' }) // Assegurar que es vegi si hi ha scroll
+        } else {
+          opt.style.backgroundColor = 'transparent'
+        }
+      })
+    }
+
+    // 1. Mostrar llista en fer focus
+    categorySearchInput.addEventListener('focus', () => {
+      if (categoryHiddenInput.value === '') {
+        renderCategoryOptions(categorySearchInput.value)
+        categoryDropdownList.style.display = 'block'
+      }
     })
 
+    // 2. Filtrar en temps real (i auto-seleccionar si en queda 1)
+    categorySearchInput.addEventListener('input', e => {
+      categoryHiddenInput.value = ''
+      categoryError.style.display = 'none'
+      categorySearchInput.style.borderColor = '#ccc'
+      renderCategoryOptions(e.target.value)
+      if (currentFilteredCategories.length > 1 || currentFilteredCategories.length === 0) {
+        categoryDropdownList.style.display = 'block'
+      }
+    })
+
+    // 3. Navegació amb teclat (Fletxes i Enter)
+    categorySearchInput.addEventListener('keydown', e => {
+      if (categoryDropdownList.style.display === 'none' || currentFilteredCategories.length === 0) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          categoryDropdownList.style.display = 'block'
+          renderCategoryOptions(categorySearchInput.value)
+        }
+        return
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        highlightedIndex = (highlightedIndex + 1) % currentFilteredCategories.length
+        updateHighlight()
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        highlightedIndex = (highlightedIndex - 1 + currentFilteredCategories.length) % currentFilteredCategories.length
+        updateHighlight()
+      } else if (e.key === 'Enter') {
+        e.preventDefault() // Evitar que enviï el formulari prematurament
+        if (highlightedIndex >= 0 && highlightedIndex < currentFilteredCategories.length) {
+          selectCategory(currentFilteredCategories[highlightedIndex])
+        }
+      } else if (e.key === 'Escape') {
+        categoryDropdownList.style.display = 'none'
+        categorySearchInput.blur()
+      }
+    })
+
+    // 4. Si canvia el tipus (Ingrés/Despesa), netegem la categoria
+    typeSelect.addEventListener('change', e => {
+      currentType = e.target.value
+      categoryHiddenInput.value = ''
+      categorySearchInput.value = ''
+      renderCategoryOptions('')
+    })
+
+    // 5. Tancar el dropdown si es fa clic fora
+    document.addEventListener('click', e => {
+      const wrapper = document.querySelector('.category-dropdown-wrapper')
+      if (wrapper && !wrapper.contains(e.target)) {
+        categoryDropdownList.style.display = 'none'
+      }
+    })
+
+    // Inicialitzar la llista
+    renderCategoryOptions('')
+
+    // ✅ LÒGICA DEL SLIDER DE PERCENTATGE (existent)
     const slider = document.getElementById('pct-slider')
     const input = document.getElementById('pct-input')
     const hint = document.getElementById('pct-hint')
@@ -537,20 +752,30 @@ export class TransactionManager {
     amountInput.addEventListener('input', updateHint)
     updateHint()
 
+    // ✅ ENVAMENT DEL FORMULARI AMB VALIDACIÓ
     document.getElementById('transaction-form').addEventListener('submit', async e => {
       e.preventDefault()
+
+      if (!categoryHiddenInput.value) {
+        categoryError.style.display = 'block'
+        categorySearchInput.style.borderColor = '#e74c3c'
+        categorySearchInput.focus()
+        return
+      }
+
       const formData = new FormData(e.target)
       const data = {
         description: formData.get('description').trim(),
         amount: parseFloat(formData.get('amount')),
         type: formData.get('type'),
         date: formData.get('date'),
-        categoryId: parseInt(formData.get('categoryId')),
+        categoryId: parseInt(categoryHiddenInput.value),
         accountId: parseInt(formData.get('accountId')) || 1,
         accountingPercentage: parseInt(formData.get('accountingPercentage')) || 100,
       }
       if (isEdit) data.id = parseInt(formData.get('id'))
-      if (!data.description || !data.amount || !data.categoryId) {
+
+      if (!data.description || !data.amount) {
         alert('Completa tots els camps obligatoris')
         return
       }
@@ -577,7 +802,6 @@ export class TransactionManager {
     const effectiveAmount = this.calculateEffectiveAmount(t)
     const hasPartialAccounting = percentage !== 100
 
-    // NOU: Detectar si és una transacció futura
     const txDate = new Date(t.date)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -586,7 +810,6 @@ export class TransactionManager {
 
     const dateStr = new Date(t.date).toLocaleDateString('ca-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
-    // NOU: Estil en línia per al color gris fluixet si és futur
     const futureStyle = isFuture ? 'background-color: #f8f9fa; opacity: 0.75; border-left: 3px solid #adb5bd;' : ''
 
     return `

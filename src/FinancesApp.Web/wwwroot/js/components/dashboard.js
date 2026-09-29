@@ -86,22 +86,18 @@ export class Dashboard {
     if (!this.eventService) return []
 
     try {
-      // Intentar usar el mètode específic del backend
       if (typeof this.eventService.getByMonth === 'function') {
         return await this.eventService.getByMonth(year, month)
       }
 
-      // Fallback: obtenir tots i filtrar al client
       const allEvents = await this.eventService.getAll()
 
       return allEvents.filter(e => {
         const eventDate = new Date(e.date)
 
         if (e.isRecurring) {
-          // Per recurrents: només comparem el mes (independentment de l'any)
           return eventDate.getMonth() + 1 === month
         } else {
-          // Per no recurrents: any i mes exactes
           return eventDate.getFullYear() === year && eventDate.getMonth() + 1 === month
         }
       })
@@ -111,7 +107,7 @@ export class Dashboard {
     }
   }
 
-  // ✅ NOU: Renderitzar widget d'esdeveniments propers (separat del calendari)
+  // ✅ NOU: Renderitzar widget d'esdeveniments propers
   renderUpcomingEventsWidget(upcomingEvents) {
     const widgetContainer = document.querySelector('.events-widget-list')
     if (!widgetContainer) return
@@ -201,7 +197,6 @@ export class Dashboard {
       return `<div class="amount ${className}">${this.formatCurrency(amount)}</div>`
     }
 
-    // ✅ Widget d'esdeveniments (buit inicialment, es omple després amb renderUpcomingEventsWidget)
     const eventsWidgetHTML = this.generateEventsWidgetHTML(upcomingEvents)
 
     return `
@@ -254,7 +249,7 @@ export class Dashboard {
         <!-- Secció de Transaccions -->
         <div class="card transactions-card" id="transactions-panel">
           <div class="transactions-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
-            <h3 id="selected-date-title">Transaccions del mes</h3>
+            <h3 id="selected-date-title" style="margin:0; font-size: 1rem; display: flex; align-items: center; gap: 8px;">Transaccions del mes</h3>
             <button id="close-transactions" class="btn-close-panel" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; width: 24px; height: 24px; text-align: center; line-height: 1; font-weight: bold;">×</button>
           </div>
           <div id="transactions-list" class="transactions-list" style="max-height: 300px; overflow-y: auto; padding: 10px;">
@@ -265,7 +260,7 @@ export class Dashboard {
         <!-- ✅ NOU: Secció d'Esdeveniments del dia seleccionat -->
         <div class="card events-day-card" id="events-day-panel" style="margin-top: 1rem;">
           <div class="events-panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border-color);">
-            <h3 id="selected-date-events-title">Esdeveniments del mes</h3>
+            <h3 id="selected-date-events-title" style="margin:0; font-size: 1rem;">Esdeveniments del mes</h3>
           </div>
           <div id="events-day-list" class="events-day-list" style="max-height: 200px; overflow-y: auto; padding: 10px;">
             ${this.renderDayEventsList(this.events)}
@@ -285,7 +280,7 @@ export class Dashboard {
   `
   }
 
-  // ✅ MODIFICAT: Generar HTML del widget (rep upcomingEvents)
+  // ✅ MODIFICAT: Generar HTML del widget
   generateEventsWidgetHTML(upcomingEvents) {
     if (!this.eventService) return ''
 
@@ -296,7 +291,6 @@ export class Dashboard {
           <a href="#events" id="view-all-events" style="font-size:0.875rem;color:var(--primary-color);text-decoration:none">Veure tots →</a>
         </div>
         <div class="events-widget-list" style="display:flex;flex-direction:column;gap:0.5rem;max-height:300px;overflow-y:auto;padding-right:4px">
-          <!-- S'omplirà dinàmicament amb renderUpcomingEventsWidget -->
           <div class="loading-events" style="text-align:center;padding:1rem;color:#64748b">Carregant...</div>
         </div>
       </div>
@@ -321,14 +315,12 @@ export class Dashboard {
     }
   }
 
-  // ✅ Obtenir esdeveniments propers (per al widget)
   async getUpcomingEvents(days = 7) {
     if (!this.eventService) return []
     try {
       if (typeof this.eventService.getUpcomingEvents === 'function') {
         return await this.eventService.getUpcomingEvents(days)
       }
-      // Fallback: obtenir tots i filtrar
       const allEvents = (await this.eventService.getAll?.()) || []
       return this.filterUpcomingEvents(allEvents, days)
     } catch (error) {
@@ -337,7 +329,6 @@ export class Dashboard {
     }
   }
 
-  // ✅ Filtrar esdeveniments propers (fallback)
   filterUpcomingEvents(events, days = 7) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -370,7 +361,6 @@ export class Dashboard {
       })
   }
 
-  // ✅ Verificar si un esdeveniment és avui
   isToday(event) {
     const today = new Date()
     const eventDate = new Date(event.date)
@@ -429,7 +419,6 @@ export class Dashboard {
     return `${mesos[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`
   }
 
-  // ✅ IMPORTANT: Aquest mètode ja utilitza this.events (del mes) per pintar indicadors
   generateCalendarHTML(dailyData) {
     const year = this.currentDate.getFullYear()
     const month = this.currentDate.getMonth()
@@ -460,7 +449,6 @@ export class Dashboard {
       const hasExpense = data.expense > 0
       const hasTransactions = data.transactions.length > 0
 
-      // ✅ Verificar si hi ha esdeveniments aquest dia (usant this.events del mes)
       const dayEvents = this.events.filter(e => this.isEventOnDay(e, day))
       const hasEvents = dayEvents.length > 0
 
@@ -485,18 +473,15 @@ export class Dashboard {
     return html
   }
 
-  // ✅ Verificar si un esdeveniment cau en un dia concret del mes actual
   isEventOnDay(event, day) {
     const eventDate = new Date(event.date)
     const currentYear = this.currentDate.getFullYear()
     const currentMonth = this.currentDate.getMonth()
 
     if (event.isRecurring) {
-      // Per recursius: comparar dia i mes, independentment de l'any
       return eventDate.getDate() === day && eventDate.getMonth() === currentMonth
     }
 
-    // Per no recursius: ha de coincidir dia, mes i any
     return eventDate.getDate() === day && eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear
   }
 
@@ -578,6 +563,13 @@ export class Dashboard {
       document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'))
     })
 
+    // ✅ NOU: Delegació d'esdeveniments per al botó de la lupa (detall del dia)
+    document.getElementById('transactions-panel')?.addEventListener('click', e => {
+      if (e.target.closest('.btn-view-day-details')) {
+        this.openDayDetailsModal()
+      }
+    })
+
     const toggleVisibility = document.getElementById('toggle-visibility')
     const toggleBlur = document.getElementById('toggle-blur')
     const summarySection = document.getElementById('summary-section')
@@ -618,11 +610,10 @@ export class Dashboard {
       }
     })
 
-    // ✅ Això ja actualitza tant transaccions com esdeveniments
     this.updateTransactionsPanel()
   }
 
-  // ✅ MODIFICAT: Actualitzar també el panell d'esdeveniments
+  // ✅ MODIFICAT: Actualitzar també el panell d'esdeveniments i afegir botó de lupa
   updateTransactionsPanel() {
     const transactionsTitle = document.getElementById('selected-date-title')
     const transactionsList = document.getElementById('transactions-list')
@@ -632,11 +623,16 @@ export class Dashboard {
     if (this.selectedDay) {
       const dateStr = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.selectedDay).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })
 
-      // Actualitzar transaccions
-      transactionsTitle.textContent = `Transaccions - ${dateStr}`
+      // Actualitzar transaccions amb botó de lupa
+      transactionsTitle.innerHTML = `
+        <span>Transaccions - ${dateStr}</span>
+        <button class="btn-view-day-details" title="Veure detall complet del dia" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; color: #64748b;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='none'; this.style.color='#64748b'">
+          🔍
+        </button>
+      `
       transactionsList.innerHTML = this.renderTransactionsList(this.transactions, this.selectedDay)
 
-      // ✅ Actualitzar esdeveniments del dia
+      // Actualitzar esdeveniments del dia
       eventsTitle.textContent = `Esdeveniments - ${dateStr}`
       eventsList.innerHTML = this.renderDayEventsList(this.events, this.selectedDay)
     } else {
@@ -644,7 +640,6 @@ export class Dashboard {
       transactionsTitle.textContent = 'Transaccions del mes'
       transactionsList.innerHTML = this.renderTransactionsList(this.transactions)
 
-      // ✅ Mostrar esdeveniments del mes
       eventsTitle.textContent = 'Esdeveniments del mes'
       eventsList.innerHTML = this.renderDayEventsList(this.events)
     }
@@ -708,7 +703,6 @@ export class Dashboard {
     }
   }
 
-  // ✅ NOU: Renderitzar llista d'esdeveniments per a un dia específic o tots els del mes
   renderDayEventsList(events, day = null) {
     let filteredEvents = events || []
 
@@ -762,5 +756,143 @@ export class Dashboard {
       `
       })
       .join('')
+  }
+
+  // ✅ NOU: Obrir popup amb el detall complet de les transaccions del dia seleccionat
+  openDayDetailsModal() {
+    if (!this.selectedDay) return
+
+    // Filtrar transaccions exactes d'aquest dia, mes i any
+    const dayTransactions = this.transactions.filter(t => {
+      const date = new Date(t.date)
+      return date.getDate() === this.selectedDay && date.getMonth() === this.currentDate.getMonth() && date.getFullYear() === this.currentDate.getFullYear()
+    })
+
+    const dateStr = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.selectedDay).toLocaleDateString('ca-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+
+    const modal = document.createElement('div')
+    modal.className = 'modal-overlay'
+
+    // Generar files de la taula
+    const rowsHtml =
+      dayTransactions.length > 0
+        ? dayTransactions
+            .map(t => {
+              const isIncome = t.type === 'income'
+              const percentage = t.accountingPercentage || 100
+              const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
+              const hasPartial = percentage !== 100
+              const timeStr = new Date(t.date).toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })
+
+              return `
+        <tr style="transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+          <td style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+            <div style="display:flex; align-items:center; gap: 10px;">
+              <span style="font-size: 1.3rem;">${isIncome ? '📈' : '📉'}</span>
+              <div>
+                <div style="font-weight: 600; color: #0f172a;">${t.description || 'Sense descripció'}</div>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">
+                  ${timeStr} 
+                  ${hasPartial ? `• <span style="color:#f59e0b; font-weight: 500;">${percentage}% comptabilitzat</span>` : ''}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: right;">
+            <div style="font-weight: 700; font-size: 1.05rem; color: ${isIncome ? '#10b981' : '#ef4444'};">
+              ${isIncome ? '+' : '-'}${this.formatCurrency(Math.abs(effectiveAmount))}
+            </div>
+            ${hasPartial ? `<div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">(Total: ${this.formatCurrency(t.amount)})</div>` : ''}
+          </td>
+        </tr>
+      `
+            })
+            .join('')
+        : `<tr><td colspan="2" style="padding: 30px; text-align: center; color: #64748b; font-style: italic;">No hi ha transaccions registrades aquest dia.</td></tr>`
+
+    const dayTotal = this.calculateDayTotal(dayTransactions)
+
+    modal.innerHTML = `
+      <div class="modal" style="max-width: 650px; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+          <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+            📅 Detall del dia: <span style="text-transform: capitalize;">${dateStr}</span>
+          </h3>
+          <button class="btn-close-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; line-height: 1; padding: 4px; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#ef4444'" onmouseout="this.style.background='none'; this.style.color='#64748b'">&times;</button>
+        </div>
+        
+        <div style="max-height: 60vh; overflow-y: auto; background: #ffffff;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #ffffff; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+              <tr>
+                <th style="padding: 12px 16px; text-align: left; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Concepte</th>
+                <th style="padding: 12px 16px; text-align: right; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Import Efectiu</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+            ${
+              dayTransactions.length > 0
+                ? `
+            <tfoot style="background: #f1f5f9; font-weight: 700; border-top: 2px solid #e2e8f0;">
+              <tr>
+                <td style="padding: 14px 16px; text-align: right; color: #334155; font-size: 0.95rem;">Balanç total del dia:</td>
+                <td style="padding: 14px 16px; text-align: right; color: ${dayTotal >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.1rem;">
+                  ${dayTotal >= 0 ? '+' : ''}${this.formatCurrency(dayTotal)}
+                </td>
+              </tr>
+            </tfoot>
+            `
+                : ''
+            }
+          </table>
+        </div>
+        
+        <div class="modal-actions" style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: right;">
+          <button type="button" class="btn-close-modal-action" style="padding: 8px 20px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-weight: 500; color: #475569; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'; this.style.borderColor='#94a3b8'" onmouseout="this.style.background='#ffffff'; this.style.borderColor='#cbd5e1'">Tancar</button>
+        </div>
+      </div>
+    `
+
+    document.body.appendChild(modal)
+
+    // Lògica per tancar el modal
+    const closeModal = () => {
+      modal.style.opacity = '0'
+      modal.style.transition = 'opacity 0.2s ease-out'
+      setTimeout(() => modal.remove(), 200)
+    }
+
+    modal.querySelector('.btn-close-modal').addEventListener('click', closeModal)
+    modal.querySelector('.btn-close-modal-action').addEventListener('click', closeModal)
+
+    // Tancar en fer clic fora del modal
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal()
+    })
+
+    // Tancar amb la tecla Escape
+    const handleEscape = e => {
+      if (e.key === 'Escape') {
+        closeModal()
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+  }
+
+  // ✅ NOU: Calcular el balanç total d'un conjunt de transaccions (tenint en compte percentatges)
+  calculateDayTotal(transactions) {
+    return transactions.reduce((sum, t) => {
+      const percentage = t.accountingPercentage || 100
+      const effectiveAmount = (Number(t.amount) || 0) * (percentage / 100)
+      return t.type === 'income' ? sum + effectiveAmount : sum - effectiveAmount
+    }, 0)
   }
 }
