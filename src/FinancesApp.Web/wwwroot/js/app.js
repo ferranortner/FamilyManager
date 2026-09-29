@@ -10,6 +10,7 @@ import { AnalysisPage } from './components/analysis.js'
 import { TransactionGroups } from './components/TransactionGroups.js'
 import { CategorySummary } from './components/CategorySummary.js'
 import { ForecastView } from './components/forecast.js'
+import { LoanAmortizationManager } from './components/loanAmortization.js'
 
 // ===== GESTIÓ DE TEMES (GLOBAL AMB DELEGACIÓ D'ESDEVENIMENTS) =====
 function initThemeSelector() {
@@ -172,6 +173,36 @@ class App {
         title.textContent = 'Previsió de Pagaments' // ← Afegit per consistència
         const forecastView = new ForecastView()
         await forecastView.render() // ← Afegit 'await' per si hi ha càrrega asíncrona
+        break
+      // ✅ Cas per a la gestió de múltiples crèdits
+      case 'loanAmortization':
+        title.textContent = 'Previsió de Crèdits'
+
+        const loansConfig = [
+          {
+            id: 'loan_1',
+            name: 'Crèdit 1 (4.500€)',
+            principal: 4500,
+            annualRate: 0.0675, // 6.75%
+            months: 48, // ✅ 48 mesos
+            startDate: '2024-12-01', // Desembre 2024 (acaba nov 2028)
+            monthlyPayment: 107.24, // ✅ Recalculat
+            totalInterest: 647.37, // ✅ Recalculat
+          },
+          {
+            id: 'loan_2',
+            name: 'Crèdit 2 (5.000€)',
+            principal: 5000,
+            annualRate: 0.08, // 8%
+            months: 60, // ✅ 60 mesos (5 anys exactes)
+            startDate: '2026-05-01', // Maig 2026 (acaba abr 2031)
+            monthlyPayment: 101.38, // ✅ Recalculat
+            totalInterest: 1082.92, // ✅ Recalculat
+          },
+        ]
+
+        const loanManager = new LoanAmortizationManager('main-content', loansConfig)
+        await loanManager.render()
         break
       default:
         title.textContent = 'Dashboard'

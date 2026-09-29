@@ -11,13 +11,7 @@ export class CategoriesManager {
   async render() {
     this.container.innerHTML = `
       <div class="page-header">
-        <div class="page-header-text">
-          <h1 class="page-title">
-            <i class="material-icons" style="vertical-align: middle; margin-right: 8px;">category</i>
-            Gestió de Categories
-          </h1>
-          <p class="page-subtitle">Configura les categories d'ingressos i despeses per organitzar i analitzar les teves finances.</p>
-        </div>
+      
         <div class="page-actions">
           <button id="btn-new-category" class="btn-app btn-app-primary">
             <i class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 4px;">add</i>
@@ -65,8 +59,8 @@ export class CategoriesManager {
                 </div>
 
                 <div class="icon-content" id="emoji-content">
-                  <input type="text" id="cat-icon" class="form-control" placeholder="Ex: 🛒 💰 🚗" maxlength="2" style="max-width: 100px; font-size: 1.5rem; text-align: center;">
-                  <p class="form-text" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Fes clic per seleccionar un emoji o escriu-lo directament.</p>
+                  <input type="text" id="cat-icon" class="form-control" placeholder="Ex: 🛒 💰 🚗" maxlength="2" style="max-width: 100px; font-size: 1.0rem; text-align: center;">
+                  <span class="form-text" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">Fes clic per seleccionar un emoji o escriu-lo directament.</span>
                 </div>
 
                 <div class="icon-content hidden" id="image-content">
@@ -169,32 +163,80 @@ export class CategoriesManager {
   renderCategoryCard(category) {
     const hasImage = category.imageUrl || category.imageData
     const iconDisplay = hasImage
-      ? `<img src="${category.imageUrl || category.imageData}" alt="${category.name}" style="width: 32px; height: 32px; object-fit: cover; border-radius: var(--radius-sm);">`
-      : `<span style="font-size: 1.5rem;">${category.icon || '📁'}</span>`
+      ? `<img src="${category.imageUrl || category.imageData}" alt="${category.name}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;">`
+      : `<span style="font-size: 1.25rem;">${category.icon || '📁'}</span>`
 
-    const badgeClass = category.type === 'income' ? 'badge-app-success' : 'badge-app-danger'
-    const badgeText = category.type === 'income' ? 'Ingrés' : 'Despesa'
+    // Colors segons el tipus
+    const bgColor =
+      category.type === 'income'
+        ? `${category.color}15` // Verd molt suau (15% opacitat)
+        : `${category.color}15` // Vermell molt suau (15% opacitat)
+
+    const borderColor =
+      category.type === 'income'
+        ? `${category.color}40` // Verd 40% opacitat
+        : `${category.color}40` // Vermell 40% opacitat
 
     return `
-      <div class="card category-card" data-id="${category.id}" style="position: relative; transition: transform 0.2s, box-shadow 0.2s; cursor: default;">
-        <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;" class="category-actions">
-          <button class="btn-app btn-app-ghost btn-app-sm btn-icon-action edit" data-id="${category.id}" title="Editar" style="color: var(--text-muted); padding: 4px;">
-            <i class="material-icons" style="font-size: 18px;">edit</i>
-          </button>
-          <button class="btn-app btn-app-ghost btn-app-sm btn-icon-action delete" data-id="${category.id}" title="Eliminar" style="color: var(--result-error-text); padding: 4px;">
-            <i class="material-icons" style="font-size: 18px;">delete</i>
-          </button>
-        </div>
-        
-        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px;">
-          <div style="width: 56px; height: 56px; border-radius: var(--radius-md); background: ${category.color}20; color: ${category.color}; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid ${category.color}40;">
-            ${iconDisplay}
-          </div>
-          <h5 style="margin: 0 0 8px 0; font-size: 1rem; font-weight: 600; color: var(--text-color); word-break: break-word;">${category.name}</h5>
-          <span class="badge-app ${badgeClass}" style="font-size: 0.7rem;">${badgeText}</span>
-        </div>
+    <div class="category-card-compact" data-id="${category.id}" style="
+      background: ${bgColor};
+      border: 1px solid ${borderColor};
+      border-radius: 8px;
+      padding: 12px;
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+    ">
+      <div style="position: absolute; top: 6px; right: 6px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s;" class="category-actions">
+        <button class="btn-icon-action edit" data-id="${category.id}" title="Editar" style="
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 2px;
+          color: var(--text-muted);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <i class="material-icons" style="font-size: 14px;">edit</i>
+        </button>
+        <button class="btn-icon-action delete" data-id="${category.id}" title="Eliminar" style="
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 2px;
+          color: var(--result-error-text);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <i class="material-icons" style="font-size: 14px;">delete</i>
+        </button>
       </div>
-    `
+      
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
+        <div style="
+          width: 40px;
+          height: 40px;
+          border-radius: 6px;
+          background: ${category.color}30;
+          color: ${category.color};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          ${iconDisplay}
+        </div>
+        <div style="
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-color);
+          word-break: break-word;
+          line-height: 1.2;
+        ">${category.name}</div>
+      </div>
+    </div>
+  `
   }
 
   attachEvents() {
@@ -248,25 +290,27 @@ export class CategoriesManager {
       this.removeImage()
     })
 
-    // Delegació d'esdeveniments per a les targetes
+    // ==========================================
+    // Delegació d'esdeveniments per a les targetes COMPACTES
+    // ==========================================
     const listContainer = document.getElementById('categories-list')
-    listContainer?.addEventListener(
-      'mouseenter',
-      e => {
-        const card = e.target.closest('.category-card')
-        if (card) card.querySelector('.category-actions').style.opacity = '1'
-      },
-      true
-    )
 
-    listContainer?.addEventListener(
-      'mouseleave',
-      e => {
-        const card = e.target.closest('.category-card')
-        if (card) card.querySelector('.category-actions').style.opacity = '0'
-      },
-      true
-    )
+    // Utilitzem 'mouseover' (bubbling) en lloc de 'mouseenter' amb capture
+    listContainer?.addEventListener('mouseover', e => {
+      const card = e.target.closest('.category-card-compact')
+      if (card) {
+        const actions = card.querySelector('.category-actions')
+        if (actions) actions.style.opacity = '1'
+      }
+    })
+
+    listContainer?.addEventListener('mouseout', e => {
+      const card = e.target.closest('.category-card-compact')
+      if (card) {
+        const actions = card.querySelector('.category-actions')
+        if (actions) actions.style.opacity = '0'
+      }
+    })
 
     listContainer?.addEventListener('click', async e => {
       const btn = e.target.closest('.btn-icon-action')

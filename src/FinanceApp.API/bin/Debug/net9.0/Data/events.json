@@ -79,6 +79,16 @@
       "notes": null,
       "createdAt": "2026-09-25T11:51:25.2381051Z",
       "updatedAt": null
+    },
+    {
+      "id": 9,
+      "title": "Aniversari Jordi",
+      "type": "birthday",
+      "date": "2026-09-26",
+      "isRecurring": true,
+      "notes": "53",
+      "createdAt": "2026-09-25T13:16:12.2631142Z",
+      "updatedAt": "2026-09-25T13:16:38.0435778Z"
     }
   ]
 }
