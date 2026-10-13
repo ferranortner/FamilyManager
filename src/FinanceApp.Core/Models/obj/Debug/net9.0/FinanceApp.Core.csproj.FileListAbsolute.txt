@@ -1,0 +1,12 @@
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\bin\Debug\net9.0\FinanceApp.Core.deps.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\bin\Debug\net9.0\FinanceApp.Core.dll
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\bin\Debug\net9.0\FinanceApp.Core.pdb
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.AssemblyInfoInputs.cache
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.AssemblyInfo.cs
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.csproj.CoreCompileInputs.cache
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.sourcelink.json
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.dll
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\refint\FinanceApp.Core.dll
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\FinanceApp.Core.pdb
+C:\OLD_DATA\Proyectos\FamilyManager\src\FinanceApp.Core\Models\obj\Debug\net9.0\ref\FinanceApp.Core.dll
