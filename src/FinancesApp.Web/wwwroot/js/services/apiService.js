@@ -1,46 +1,29 @@
-const API_URL = 'http://localhost:5158/api' // ← Puerto 5158, no 5000
+// services/apiService.js
+// Client HTTP únic per a totes les crides al backend.
+
+export const API_URL = 'http://localhost:5158/api'
 
 class ApiService {
   async request(endpoint, options = {}) {
-    const url = `${API_URL}${endpoint}`
     const config = {
-      headers: { 'Content-Type': 'application/json', ...options.headers },
+      method: 'GET',
       ...options,
+      headers: { 'Content-Type': 'application/json', ...options.headers },
     }
 
-    if (config.body) config.body = JSON.stringify(config.body)
+    if (config.body !== undefined) config.body = JSON.stringify(config.body)
 
-    console.log('🚀 Enviant petició:', {
-      url,
-      method: config.method || 'GET',
-      body: config.body,
-    })
+    const response = await fetch(`${API_URL}${endpoint}`, config)
 
-    try {
-      const response = await fetch(url, config)
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return await response.json()
-    } catch (error) {
-      console.error('API Error:', error)
-      throw error
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}))
+      throw new Error(err.error || `HTTP ${response.status}`)
     }
-  }
 
-  getTransactions(filters = {}) {
-    const params = new URLSearchParams(filters)
-    return this.request(`/transactions?${params}`)
-  }
+    // 204 No Content (DELETE / PUT sense cos)
+    if (response.status === 204) return null
 
-  createTransaction(data) {
-    return this.request('/transactions', { method: 'POST', body: data })
-  }
-
-  deleteTransaction(id) {
-    return this.request(`/transactions/${id}`, { method: 'DELETE' })
-  }
-
-  getSummary(year, month) {
-    return this.request(`/reports/summary?year=${year}&month=${month}`)
+    return response.json()
   }
 }
 

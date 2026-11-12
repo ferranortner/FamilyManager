@@ -47,7 +47,7 @@ namespace FinanceApp.API.Services
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 };
                 var json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(_filePath, json);
+                FinanceApp.API.Data.SafeJsonFile.WriteAtomic(_filePath, json);
             }
         }
 

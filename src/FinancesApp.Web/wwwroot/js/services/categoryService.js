@@ -54,6 +54,20 @@ class CategoryService {
     })
   }
 
+  // Puja una imatge (data URL) per a la categoria; el backend la guarda a DataStorage/category-images
+  async uploadImage(id, dataUrl) {
+    this.invalidateCache()
+    return this.api.request(`/categories/${id}/image`, {
+      method: 'POST',
+      body: { dataUrl },
+    })
+  }
+
+  async deleteImage(id) {
+    this.invalidateCache()
+    return this.api.request(`/categories/${id}/image`, { method: 'DELETE' })
+  }
+
   invalidateCache() {
     this.cache = null
     this.cacheTime = null

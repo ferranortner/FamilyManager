@@ -1,0 +1,11 @@
+# Compilació
+bin/
+obj/
+
+# Visual Studio / VS Code
+.vs/
+*.user
+
+# Còpies temporals de les dades (generades per SafeJsonFile)
+*.tmp
+*.bak

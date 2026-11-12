@@ -119,6 +119,46 @@
       "notes": null,
       "createdAt": "2026-09-29T13:13:20.530839Z",
       "updatedAt": null
+    },
+    {
+      "id": 13,
+      "title": "Aniversari Laura Morer",
+      "type": "birthday",
+      "date": "2026-10-10",
+      "isRecurring": true,
+      "notes": "44?",
+      "createdAt": "2026-10-13T07:50:44.2707849Z",
+      "updatedAt": null
+    },
+    {
+      "id": 14,
+      "title": "Excursi\u00F3 muntanyisme - Montseny",
+      "type": "reminder",
+      "date": "2026-10-17",
+      "isRecurring": false,
+      "notes": null,
+      "createdAt": "2026-10-13T07:51:31.6135162Z",
+      "updatedAt": null
+    },
+    {
+      "id": 15,
+      "title": "Reuni\u00F3 Irlanda",
+      "type": "reminder",
+      "date": "2026-10-13",
+      "isRecurring": false,
+      "notes": "Viatge Xavier (escola)",
+      "createdAt": "2026-10-13T07:52:23.4199891Z",
+      "updatedAt": null
+    },
+    {
+      "id": 16,
+      "title": "Aniversari Ferran",
+      "type": "birthday",
+      "date": "2026-10-28",
+      "isRecurring": true,
+      "notes": "1976 - 50",
+      "createdAt": "2026-10-13T07:53:16.8987149Z",
+      "updatedAt": "2026-10-13T07:53:34.7801648Z"
     }
   ]
 }

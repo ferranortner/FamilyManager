@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "7alr/GSzCpA=",
+  "dgSpecHash": "pyo1//9Gb8k=",
   "success": true,
   "projectFilePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
   "expectedPackageFiles": [
@@ -16,15 +16,6 @@
       "code": "NU1900",
       "level": "Warning",
       "message": "Error al obtener los datos de vulnerabilidad del paquete: No se puede cargar el índice de servicio para el origen https://nuget-pro-v2.winsysgroup.com:8443/v3/index.json.",
-      "projectPath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
-      "targetGraphs": []
-    },
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error al obtener los datos de vulnerabilidad del paquete: No se puede cargar el índice de servicio para el origen https://nuget-pre-v2.winsysgroup.com:8443/v3/index.json.",
       "projectPath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",
       "warningLevel": 1,
       "filePath": "C:\\OLD_DATA\\Proyectos\\FamilyManager\\src\\FinanceApp.API\\FinanceApp.API.csproj",

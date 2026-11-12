@@ -11,60 +11,21 @@ import { TransactionGroups } from './components/TransactionGroups.js'
 import { CategorySummary } from './components/CategorySummary.js'
 import { ForecastView } from './components/forecast.js'
 import { LoanAmortizationManager } from './components/loanAmortization.js'
+import { BudgetsView } from './components/budgets.js'
+import { RecurringView } from './components/recurring.js'
+import { QuickAdd } from './components/quickAdd.js'
+import { loanService } from './services/loanService.js'
 
-// ===== GESTIÓ DE TEMES (GLOBAL AMB DELEGACIÓ D'ESDEVENIMENTS) =====
-function initThemeSelector() {
-  const body = document.body
-
-  // Aplicar tema guardat immediatament
-  const savedTheme = localStorage.getItem('financeApp-theme') || 'theme-light'
-  aplicarTema(savedTheme)
-
-  // DELEGACIÓ D'ESDEVENIMENTS: Escoltar clics a nivell de document
-  // Així funciona encara que el DOM canviï
-  document.addEventListener('click', e => {
-    // Buscar si s'ha clicat sobre una opció de tema
-    const themeOption = e.target.closest('.theme-option')
-    if (themeOption) {
-      e.preventDefault()
-      e.stopPropagation()
-
-      const theme = themeOption.dataset.theme
-      if (theme) {
-        aplicarTema(theme)
-        localStorage.setItem('financeApp-theme', theme)
-        console.log('Tema canviat a:', theme)
-      }
-    }
-  })
-
-  // També gestionar el hover del dropdown si cal
-  const dropdown = document.querySelector('.theme-selector .dropdown')
-  if (dropdown) {
-    // Per mòbils: toggle amb clic al botó
-    const btn = dropdown.querySelector('.btn-icon')
-    if (btn) {
-      btn.addEventListener('click', e => {
-        e.stopPropagation()
-        dropdown.classList.toggle('active')
-      })
-    }
-
-    // Tancar dropdown quan es clica fora
-    document.addEventListener('click', e => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('active')
-      }
-    })
-  }
-
-  function aplicarTema(themeName) {
-    // Eliminar totes les classes de tema existents
-    body.classList.remove('theme-light', 'theme-dark', 'theme-blue', 'theme-green', 'theme-amber', 'theme-metal')
-    // Afegir la classe del tema seleccionat
-    body.classList.add(themeName)
-  }
-}
+const DEFAULT_CATEGORIES = [
+  { name: 'Nòmina', type: 'income', color: '#10b981', icon: '' },
+  { name: 'Freelance', type: 'income', color: '#34d399', icon: '' },
+  { name: 'Compres', type: 'expense', color: '#f59e0b', icon: '' },
+  { name: 'Transport', type: 'expense', color: '#3b82f6', icon: '' },
+  { name: 'Menjar', type: 'expense', color: '#ef4444', icon: '' },
+  { name: 'Serveis', type: 'expense', color: '#8b5cf6', icon: '' },
+  { name: 'Oci', type: 'expense', color: '#ec4899', icon: '' },
+  { name: 'Salut', type: 'expense', color: '#14b8a6', icon: '' },
+]
 
 class App {
   constructor() {
@@ -78,6 +39,7 @@ class App {
   async init() {
     await this.initializeDefaultData()
     this.setupNavigation()
+    new QuickAdd().mount()
     this.navigate('dashboard')
   }
 
@@ -85,18 +47,7 @@ class App {
     try {
       const categories = await this.categoryService.getAll()
       if (categories.length === 0) {
-        console.log('Creant categories per defecte...')
-        const defaultCategories = [
-          { name: 'Nòmina', type: 'income', color: '#10b981', icon: '💰' },
-          { name: 'Freelance', type: 'income', color: '#34d399', icon: '💻' },
-          { name: 'Compres', type: 'expense', color: '#f59e0b', icon: '🛒' },
-          { name: 'Transport', type: 'expense', color: '#3b82f6', icon: '🚗' },
-          { name: 'Menjar', type: 'expense', color: '#ef4444', icon: '🍔' },
-          { name: 'Serveis', type: 'expense', color: '#8b5cf6', icon: '💡' },
-          { name: 'Oci', type: 'expense', color: '#ec4899', icon: '🎮' },
-          { name: 'Salut', type: 'expense', color: '#14b8a6', icon: '⚕️' },
-        ]
-        for (const cat of defaultCategories) {
+        for (const cat of DEFAULT_CATEGORIES) {
           try {
             await this.categoryService.create(cat)
           } catch (err) {
@@ -113,111 +64,66 @@ class App {
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault()
-        const view = e.target.dataset.view
-        this.navigate(view)
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'))
-        e.target.classList.add('active')
+        this.setActiveLink(link.dataset.view)
+        this.navigate(link.dataset.view)
       })
     })
 
     window.navigateToEvents = () => {
+      this.setActiveLink('events')
       this.navigate('events')
-      document.querySelectorAll('.nav-link').forEach(l => {
-        l.classList.toggle('active', l.dataset.view === 'events')
-      })
     }
+  }
+
+  setActiveLink(view) {
+    document.querySelectorAll('.nav-link').forEach(l => {
+      l.classList.toggle('active', l.dataset.view === view)
+    })
+  }
+
+  // Els préstecs es carreguen del backend (JSON); si no n'hi ha, es mostra un missatge
+  async renderLoans() {
+    const container = document.getElementById('main-content')
+    let loans = []
+    try {
+      loans = await loanService.getAll()
+    } catch (err) {
+      container.innerHTML = `<p class="error-detail">Error carregant préstecs: ${err.message}</p>`
+      return
+    }
+
+    if (loans.length === 0) {
+      container.innerHTML = '<div class="empty-state-full"><p>Encara no hi ha préstecs definits</p></div>'
+      return
+    }
+
+    await new LoanAmortizationManager('main-content', loans).render()
   }
 
   async navigate(view) {
-    const container = document.getElementById('main-content')
     const title = document.getElementById('page-title')
     this.currentView = view
 
-    switch (view) {
-      case 'dashboard':
-        title.textContent = 'Dashboard'
-        const dashboard = new Dashboard('main-content', this.financeService, this.eventService)
-        await dashboard.render()
-        break
-      case 'categories':
-        title.textContent = 'Categories'
-        const categoriesManager = new CategoriesManager('main-content')
-        await categoriesManager.render()
-        break
-      case 'transactions':
-        title.textContent = 'Transaccions'
-        const transactionManager = new TransactionManager('main-content')
-        await transactionManager.render()
-        break
-      case 'events':
-        title.textContent = 'Esdeveniments'
-        const eventManager = new EventManager('main-content')
-        await eventManager.render()
-        break
-      case 'analysis':
-        title.textContent = "Anàlisi d'Evolució"
-        const analysisPage = new AnalysisPage(this.financeService, this.categoryService)
-        await analysisPage.render('main-content')
-        break
-      case 'groups':
-        title.textContent = 'Grups de Transaccions'
-        const transactionGroups = new TransactionGroups('main-content')
-        await transactionGroups.render()
-        break
-      case 'categoriesSummary':
-        title.textContent = 'Resum de Categories'
-        const categorySummary = new CategorySummary('main-content')
-        categorySummary.render()
-        break
-      case 'forecast':
-        title.textContent = 'Previsió de Pagaments' // ← Afegit per consistència
-        const forecastView = new ForecastView()
-        await forecastView.render() // ← Afegit 'await' per si hi ha càrrega asíncrona
-        break
-      // ✅ Cas per a la gestió de múltiples crèdits
-      case 'loanAmortization':
-        title.textContent = 'Previsió de Crèdits'
-
-        const loansConfig = [
-          {
-            id: 'loan_1',
-            name: 'Crèdit 1 (4.500€)',
-            principal: 4500,
-            annualRate: 0.0675, // 6.75%
-            months: 48, // ✅ 48 mesos
-            startDate: '2024-12-01', // Desembre 2024 (acaba nov 2028)
-            monthlyPayment: 107.24, // ✅ Recalculat
-            totalInterest: 647.37, // ✅ Recalculat
-          },
-          {
-            id: 'loan_2',
-            name: 'Crèdit 2 (5.000€)',
-            principal: 5000,
-            annualRate: 0.08, // 8%
-            months: 60, // ✅ 60 mesos (5 anys exactes)
-            startDate: '2026-05-01', // Maig 2026 (acaba abr 2031)
-            monthlyPayment: 101.38, // ✅ Recalculat
-            totalInterest: 1082.92, // ✅ Recalculat
-          },
-        ]
-
-        const loanManager = new LoanAmortizationManager('main-content', loansConfig)
-        await loanManager.render()
-        break
-      default:
-        title.textContent = 'Dashboard'
-        const defaultDashboard = new Dashboard('main-content', this.financeService, this.eventService)
-        await defaultDashboard.render()
-        break
+    const views = {
+      dashboard: { title: 'Panell', render: () => new Dashboard('main-content', this.financeService, this.eventService).render() },
+      transactions: { title: 'Transaccions', render: () => new TransactionManager('main-content').render() },
+      events: { title: 'Esdeveniments', render: () => new EventManager('main-content').render() },
+      analysis: { title: "Anàlisi d'evolució", render: () => new AnalysisPage(this.financeService, this.categoryService).render('main-content') },
+      groups: { title: 'Grups de transaccions', render: () => new TransactionGroups('main-content').render() },
+      categories: { title: 'Categories', render: () => new CategoriesManager('main-content').render() },
+      categoriesSummary: { title: 'Resum per categories', render: () => new CategorySummary('main-content').render() },
+      forecast: { title: 'Previsió de pagaments', render: () => new ForecastView().render() },
+      budgets: { title: 'Pressupostos', render: () => new BudgetsView('main-content').render() },
+      recurring: { title: 'Transaccions recurrents', render: () => new RecurringView('main-content').render() },
+      loanAmortization: { title: 'Previsió de crèdits', render: () => this.renderLoans() },
     }
+
+    const target = views[view] ?? views.dashboard
+    title.textContent = target.title
+    await target.render()
   }
 }
 
-// Iniciar tot quan el DOM estigui llest
 document.addEventListener('DOMContentLoaded', () => {
-  // Inicialitzar selector de temes PRIMER (amb delegació d'esdeveniments)
-  initThemeSelector()
-
-  // DESPRÉS iniciar l'aplicació
   window.app = new App()
 })

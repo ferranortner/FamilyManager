@@ -6,67 +6,35 @@
     <title>FinanceApp</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js "></script> -->
     <script src="js/utils/chart.min.js"></script>
-    <!-- Afegir Material Icons per als icones -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   </head>
   <body>
     <div class="app-container">
       <aside class="sidebar">
-        <!-- <div class="logo">💰 FinanceApp</div> -->
-        <nav class="sidebar">
-          <a href="#" class="nav-link active" data-view="dashboard"> 📊 Dashboard </a>
-          <a href="#" class="nav-link" data-view="transactions"> 💸 Transaccions </a>
-          <a href="#" class="nav-link" data-view="events"> 📅 Esdeveniments </a>
-          <a href="#" class="nav-link" data-view="analysis"> 📈 Anàlisi </a>
-          <a href="#" class="nav-link" data-view="groups"> 📦 Grups </a>
-          <a href="#" class="nav-link" data-view="categories"> 🏷️ Categories </a>
-          <a href="#" class="nav-link" data-view="categoriesSummary"> 📋 Resum Categories </a>
-          <a href="#" class="nav-link" data-view="forecast"> 📅 Previsió Pagaments </a>
-          <a href="#" class="nav-link" data-view="loanAmortization"> 📅 Previsió crèdits </a>
+        <div class="brand">FinanceApp</div>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-link active" data-view="dashboard">Panell</a>
+          <a href="#" class="nav-link" data-view="transactions">Transaccions</a>
+          <a href="#" class="nav-link" data-view="events">Esdeveniments</a>
+          <a href="#" class="nav-link" data-view="analysis">Anàlisi</a>
+          <a href="#" class="nav-link" data-view="groups">Grups</a>
+          <a href="#" class="nav-link" data-view="categories">Categories</a>
+          <a href="#" class="nav-link" data-view="categoriesSummary">Resum per categories</a>
+          <a href="#" class="nav-link" data-view="budgets">Pressupostos</a>
+          <a href="#" class="nav-link" data-view="recurring">Recurrents</a>
+          <a href="#" class="nav-link" data-view="forecast">Previsió de pagaments</a>
+          <a href="#" class="nav-link" data-view="loanAmortization">Previsió de crèdits</a>
         </nav>
+        <div class="sidebar-footer">
+          <a href="http://localhost:5158/api/backup/transactions.csv" class="nav-link-action" download>Exporta transaccions (CSV)</a>
+          <a href="http://localhost:5158/api/backup/export" class="nav-link-action" download>Exporta còpia de seguretat</a>
+        </div>
       </aside>
 
       <main class="main-content">
         <header class="top-bar">
-          <h1 id="page-title">Dashboard</h1>
-          <!-- ← ESTE ID ES IMPORTANTE -->
-
-          <!-- SELECTOR DE TEMES AFEGIT AQUÍ -->
-          <div class="theme-selector">
-            <div class="dropdown">
-              <button class="btn-icon" title="Canviar tema">
-                <i class="material-icons">palette</i>
-              </button>
-              <div class="dropdown-content">
-                <div class="theme-option" data-theme="theme-light">
-                  <div class="theme-preview light"></div>
-                  <span>Tema clar</span>
-                </div>
-                <div class="theme-option" data-theme="theme-dark">
-                  <div class="theme-preview dark"></div>
-                  <span>Tema fosc</span>
-                </div>
-                <div class="theme-option" data-theme="theme-blue">
-                  <div class="theme-preview blue"></div>
-                  <span>Tema blau</span>
-                </div>
-                <div class="theme-option" data-theme="theme-green">
-                  <div class="theme-preview green"></div>
-                  <span>Tema verd</span>
-                </div>
-                <div class="theme-option" data-theme="theme-amber">
-                  <div class="theme-preview amber"></div>
-                  <span>Tema pressec</span>
-                </div>
-                <div class="theme-option" data-theme="theme-metal">
-                  <div class="theme-preview metal"></div>
-                  <span>Tema metàl·lic</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <h1 id="page-title">Panell</h1>
         </header>
         <div id="main-content" class="content-area"></div>
       </main>

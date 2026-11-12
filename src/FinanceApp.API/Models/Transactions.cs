@@ -9,6 +9,7 @@ public class Transaction
     public string Type { get; set; } = "expense"; // "income" o "expense"
     public int AccountingPercentage { get; set; } = 100; // ✅ NOU: Percentatge (default 100%)
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int? RecurringRuleId { get; set; } // null = manual; si té valor, ve d'una regla recurrent
 
     // NOTA: No incloure Category aquí, només CategoryId
 }

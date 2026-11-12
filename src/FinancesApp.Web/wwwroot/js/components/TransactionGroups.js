@@ -1,4 +1,4 @@
-import { financeService } from '../services/financeService.js'
+﻿import { financeService } from '../services/financeService.js'
 import { categoryService } from '../services/categoryService.js'
 
 export class TransactionGroups {
@@ -30,16 +30,16 @@ export class TransactionGroups {
               <label>Agrupar per</label>
               <div class="group-tabs">
                 <button class="tab-btn active" data-group="month">
-                  <span>📅</span> Mes
+                  Mes
                 </button>
                 <button class="tab-btn" data-group="type">
-                  <span>💰</span> Tipus
+                  Tipus
                 </button>
                 <button class="tab-btn" data-group="amount">
-                  <span>💶</span> Import
+                  Import
                 </button>
                 <button class="tab-btn" data-group="category">
-                  <span>🏷️</span> Categoria
+                  Categoria
                 </button>
               </div>
             </div>

@@ -51,6 +51,20 @@ namespace FinanceApp.API.Data
             }
         }
 
+        // Contingut tal com està al disc (per a la còpia de seguretat)
+        public async Task<string?> GetRawJsonAsync()
+        {
+            await _semaphore.WaitAsync();
+            try
+            {
+                return File.Exists(_filePath) ? await File.ReadAllTextAsync(_filePath) : null;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
         public async Task SaveDataAsync(FinanceData data)
         {
             await _semaphore.WaitAsync();
@@ -62,7 +76,7 @@ namespace FinanceApp.API.Data
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 };
                 var json = JsonSerializer.Serialize(data, options);
-                await File.WriteAllTextAsync(_filePath, json);
+                await SafeJsonFile.WriteAtomicAsync(_filePath, json);
 
                 Console.WriteLine($"[JsonDataStore] Guardat: {data.Transactions.Count} transaccions");
             }

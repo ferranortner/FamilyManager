@@ -1,4 +1,4 @@
-// components/loanAmortization.js
+﻿// components/loanAmortization.js
 
 export class LoanAmortizationManager {
   constructor(containerId, loansConfig) {
@@ -31,10 +31,10 @@ export class LoanAmortizationManager {
         <div class="loan-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
           <button class="loan-tab-btn ${this.currentLoanId === 'combined' ? 'active' : ''}" 
                   data-loan-id="combined" 
-                  style="padding: 10px 20px; border: none; background: ${this.currentLoanId === 'combined' ? '#28a745' : '#f1f3f5'}; 
-                         color: ${this.currentLoanId === 'combined' ? '#fff' : '#495057'}; border-radius: 6px; 
+                  style="padding: 10px 20px; border: none; background: ${this.currentLoanId === 'combined' ? '#1f3a5f' : '#f2f4f7'}; 
+                         color: ${this.currentLoanId === 'combined' ? '#ffffff' : '#344054'}; border-radius: 6px; 
                          font-weight: 600; cursor: pointer; font-size: 0.95em;">
-            📊 Resum Combinat
+             Resum Combinat
           </button>
           ${this.loansConfig
             .map(
@@ -57,13 +57,13 @@ export class LoanAmortizationManager {
         <!-- Botó col·lapsar + Filtres -->
         <div style="display: flex; gap: 16px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap;">
           
-          <button id="collapse-btn" style="flex: 1; min-width: 200px; padding: 10px; background: #f8f9fa; border: 1px dashed #dee2e6; border-radius: 6px; cursor: pointer; font-weight: 600; color: #6c757d; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <button id="collapse-btn" style="flex: 1; min-width: 200px; padding: 10px; background: #f8f9fa; border: 1px dashed #dee2e6; border-radius: 6px; cursor: pointer; font-weight: 600; color: #667085; display: flex; align-items: center; justify-content: center; gap: 8px;">
             <span>${toggleIcon}</span>
             <span>${toggleText}</span>
           </button>
 
           <div class="control-group">
-            <label for="year-filter" style="font-weight: 600; color: #495057; display: block; margin-bottom: 4px; font-size: 0.8em; text-transform: uppercase;">Filtrar per any</label>
+            <label for="year-filter" style="font-weight: 600; color: #344054; display: block; margin-bottom: 4px; font-size: 0.8em; text-transform: uppercase;">Filtrar per any</label>
             <select id="year-filter" style="padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.95em; min-width: 150px;">
               <option value="all">Tots els anys</option>
               ${this.getUniqueYearsForCurrentView()
@@ -73,7 +73,7 @@ export class LoanAmortizationManager {
           </div>
 
           <div class="control-group" style="padding-bottom: 8px;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500; color: #495057; text-transform: uppercase;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500; color: #344054; text-transform: uppercase;">
               <input type="checkbox" id="hide-past-cb" ${this.hidePastExceptLast ? 'checked' : ''} style="width: 18px; height: 18px;">
               Ocultar antigues (menys l'última)
             </label>
@@ -170,63 +170,63 @@ export class LoanAmortizationManager {
     const percentComplete = ((paidMonths / totalMonths) * 100).toFixed(1)
 
     return `
-      <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: stretch;">
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; align-items: stretch;">
         
         <!-- Esquerra: 4 targetes COMPACTES -->
-        <div style="flex: 0 0 380px;">
+        <div style="flex: 1 1 340px; max-width: 460px; min-width: 280px;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 14px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(102,126,234,0.3);">
-              <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 500;"> Deute Pendent</div>
+            <div style="background: #ffffff; border-left: 4px solid #1f3a5f; color: #101828; border-radius: 8px; padding: 14px; text-align: center; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+              <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 500;">Deute Pendent</div>
               <div style="font-size: 1.4em; font-weight: 700;">${this.formatCurrency(globalPending)}</div>
             </div>
 
-            <div style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); border-radius: 8px; padding: 14px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(108,117,125,0.3);">
-              <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 500;">✅ Capital Amortitzat</div>
+            <div style="background: #ffffff; border-left: 4px solid #475467; color: #101828; border-radius: 8px; padding: 14px; text-align: center; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+              <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 500;"> Capital Amortitzat</div>
               <div style="font-size: 1.4em; font-weight: 700;">${this.formatCurrency(globalAmortized)}</div>
             </div>
 
-            <div style="background: linear-gradient(135deg, #d63384 0%, #c82333 100%); border-radius: 8px; padding: 14px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(214,51,132,0.3);">
-              <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 500;">📉 Interessos Pagats</div>
+            <div style="background: #ffffff; border-left: 4px solid #b42318; color: #101828; border-radius: 8px; padding: 14px; text-align: center; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+              <div style="font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 500;"> Interessos Pagats</div>
               <div style="font-size: 1.4em; font-weight: 700;">${this.formatCurrency(globalInterest)}</div>
             </div>
 
-            <div style="background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px); border-radius: 8px; padding: 14px; text-align: center; border: 2px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-              <div style="font-size: 0.8em; color: #495057; margin-bottom: 6px; font-weight: 500;">📊 Completat</div>
-              <div style="font-size: 1.3em; font-weight: 700; color: #28a745;">${paidMonths}/${totalMonths}</div>
-              <div style="font-size: 0.8em; color: #28a745; font-weight: 600;">(${percentComplete}%)</div>
+            <div style="background: #f9fafb; border-radius: 8px; padding: 14px; text-align: center; border: 1px solid #d0d5dd; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+              <div style="font-size: 0.8em; color: #344054; margin-bottom: 6px; font-weight: 500;"> Completat</div>
+              <div style="font-size: 1.3em; font-weight: 700; color: #1e7a4a;">${paidMonths}/${totalMonths}</div>
+              <div style="font-size: 0.8em; color: #1e7a4a; font-weight: 600;">(${percentComplete}%)</div>
             </div>
 
           </div>
         </div>
 
         <!-- Dreta: Taula de desglossament GRAN -->
-        <div style="flex: 1; background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
-          <h4 style="margin: 0 0 12px 0; color: #495057; font-size: 1em; font-weight: 600;">Desglossament per crèdit:</h4>
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="flex: 2 1 460px; min-width: 0; background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06); border: 1px solid #d0d5dd;">
+          <h4 style="margin: 0 0 12px 0; color: #344054; font-size: 1em; font-weight: 600;">Desglossament per crèdit:</h4>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
             ${this.loansConfig
               .map(loan => {
                 const state = loanStates[loan.id]
                 const percent = ((state.paid / state.total) * 100).toFixed(1)
                 return `
-                <div style="display: grid; grid-template-columns: 1.2fr auto auto auto auto; gap: 12px; padding: 14px; background: #f8f9fa; border-radius: 6px; align-items: center;">
-                  <div style="font-weight: 600; color: #495057; font-size: 0.95em;">${loan.name}</div>
+                <div style="display: grid; grid-template-columns: minmax(120px, 1.3fr) repeat(4, minmax(80px, 1fr)); gap: 8px; padding: 10px 12px; background: #f9fafb; border: 1px solid #eaecf0; border-radius: 6px; align-items: center;">
+                  <div style="font-weight: 600; color: #344054; font-size: 0.95em;">${loan.name}</div>
                   <div style="text-align: center;">
-                    <div style="font-size: 0.75em; color: #6c757d;">Amortitzat</div>
-                    <div style="font-size: 1.1em; font-weight: 700; color: #28a745;">${this.formatCurrency(state.amortized)}</div>
-                    <div style="font-size: 0.75em; color: #28a745;">${percent}%</div>
+                    <div style="font-size: 0.75em; color: #667085;">Amortitzat</div>
+                    <div style="font-size: 1em; font-weight: 700; color: #1e7a4a;">${this.formatCurrency(state.amortized)}</div>
+                    <div style="font-size: 0.75em; color: #1e7a4a;">${percent}%</div>
                   </div>
                   <div style="text-align: center;">
-                    <div style="font-size: 0.75em; color: #6c757d;">Capital Pendent</div>
-                    <div style="font-size: 1.1em; font-weight: 700; color: #dc3545;">${this.formatCurrency(state.pending)}</div>
+                    <div style="font-size: 0.75em; color: #667085;">Capital Pendent</div>
+                    <div style="font-size: 1em; font-weight: 700; color: #b42318;">${this.formatCurrency(state.pending)}</div>
                   </div>
                   <div style="text-align: center;">
-                    <div style="font-size: 0.75em; color: #6c757d;">Interessos Pagats</div>
-                    <div style="font-size: 1.1em; font-weight: 700; color: #ffc107; text-shadow: 0 0 2px rgba(0,0,0,0.2);">${this.formatCurrency(state.interest)}</div>
+                    <div style="font-size: 0.75em; color: #667085;">Interessos Pagats</div>
+                    <div style="font-size: 1em; font-weight: 700; color: #b54708;">${this.formatCurrency(state.interest)}</div>
                   </div>
                   <div style="text-align: center;">
-                    <div style="font-size: 0.75em; color: #6c757d;">Interessos Pendents</div>
-                    <div style="font-size: 1.1em; font-weight: 700; color: #fd7e14;">${this.formatCurrency(state.pendingInterest)}</div>
+                    <div style="font-size: 0.75em; color: #667085;">Interessos Pendents</div>
+                    <div style="font-size: 1em; font-weight: 700; color: #b54708;">${this.formatCurrency(state.pendingInterest)}</div>
                   </div>
                 </div>
               `
@@ -272,25 +272,25 @@ export class LoanAmortizationManager {
     return `
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
         
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 20px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(102,126,234,0.3);">
-          <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; font-weight: 500;">💰 Deute Pendent</div>
+        <div style="background: #ffffff; border-left: 4px solid #1f3a5f; color: #101828; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+          <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; font-weight: 500;">Deute Pendent</div>
           <div style="font-size: 1.8em; font-weight: 700;">${this.formatCurrency(pending)}</div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); border-radius: 8px; padding: 20px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(108,117,125,0.3);">
-          <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; font-weight: 500;">✅ Capital Amortitzat</div>
+        <div style="background: #ffffff; border-left: 4px solid #475467; color: #101828; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+          <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; font-weight: 500;"> Capital Amortitzat</div>
           <div style="font-size: 1.8em; font-weight: 700;">${this.formatCurrency(amortized)}</div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #d63384 0%, #c82333 100%); border-radius: 8px; padding: 20px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(214,51,132,0.3);">
+        <div style="background: #ffffff; border-left: 4px solid #b42318; color: #101828; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
           <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 8px; font-weight: 500;"> Interessos Pagats</div>
           <div style="font-size: 1.8em; font-weight: 700;">${this.formatCurrency(interest)}</div>
         </div>
 
-        <div style="background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px); border-radius: 8px; padding: 20px; text-align: center; border: 2px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="font-size: 0.9em; color: #495057; margin-bottom: 8px; font-weight: 500;">📊 Completat</div>
-          <div style="font-size: 1.6em; font-weight: 700; color: #28a745;">${paidMonths}/${loan.months}</div>
-          <div style="font-size: 0.9em; color: #28a745; font-weight: 600;">(${percentComplete}%)</div>
+        <div style="background: #f9fafb; border-radius: 8px; padding: 20px; text-align: center; border: 1px solid #d0d5dd; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);">
+          <div style="font-size: 0.9em; color: #344054; margin-bottom: 8px; font-weight: 500;"> Completat</div>
+          <div style="font-size: 1.6em; font-weight: 700; color: #1e7a4a;">${paidMonths}/${loan.months}</div>
+          <div style="font-size: 0.9em; color: #1e7a4a; font-weight: 600;">(${percentComplete}%)</div>
         </div>
 
       </div>
@@ -420,7 +420,7 @@ export class LoanAmortizationManager {
 
     if (itemDate < today) {
       rowStyle = 'background-color: #d4edda;'
-      leftBorder = 'border-left: 5px solid #28a745;'
+      leftBorder = 'border-left: 5px solid #1e7a4a;'
     } else if (itemDate > today) {
       rowStyle = 'background-color: #f8f9fa; opacity: 0.85;'
       leftBorder = 'border-left: 5px solid #adb5bd;'
@@ -445,7 +445,7 @@ export class LoanAmortizationManager {
               .find(l => l.id === d.loanId)
               .name.split('(')[0]
               .trim()
-            return `<span style="background: #e9ecef; padding: 2px 8px; border-radius: 4px; color: #495057;">${loanName}: ${this.formatCurrency(d.payment)}</span>`
+            return `<span style="background: #e9ecef; padding: 2px 8px; border-radius: 4px; color: #344054;">${loanName}: ${this.formatCurrency(d.payment)}</span>`
           })
           .join('')}
       </div>`
@@ -456,14 +456,14 @@ export class LoanAmortizationManager {
         <div style="display: grid; grid-template-columns: 1.5fr auto auto auto auto; gap: 16px; align-items: center;">
           
           <div>
-            <div style="font-weight: 600; font-size: 1.05em; color: #495057; margin-bottom: 4px;">${description}</div>
-            <div style="font-size: 0.85em; color: #6c757d;">${dateStr}</div>
+            <div style="font-weight: 600; font-size: 1.05em; color: #344054; margin-bottom: 4px;">${description}</div>
+            <div style="font-size: 0.85em; color: #667085;">${dateStr}</div>
             ${extraInfo}
           </div>
 
           <div style="text-align: right;">
-            <div style="font-size: 1.3em; font-weight: 700; color: #dc3545;">-${this.formatCurrency(item.payment)}</div>
-            <div style="font-size: 0.8em; color: #6c757d;">Total</div>
+            <div style="font-size: 1.3em; font-weight: 700; color: #b42318;">-${this.formatCurrency(item.payment)}</div>
+            <div style="font-size: 0.8em; color: #667085;">Total</div>
           </div>
 
           <div style="text-align: center; background: #fff3cd; padding: 8px 12px; border-radius: 6px;">

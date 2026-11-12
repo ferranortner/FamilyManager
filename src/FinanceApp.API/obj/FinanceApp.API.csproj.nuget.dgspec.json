@@ -25,7 +25,6 @@
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {},
-          "https://nuget-pre-v2.winsysgroup.com:8443/v3/index.json": {},
           "https://nuget-pro-v2.winsysgroup.com:8443/v3/index.json": {}
         },
         "frameworks": {
@@ -74,7 +73,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.318/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.321/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

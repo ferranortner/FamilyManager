@@ -68,7 +68,8 @@ namespace FinanceApp.API.Controllers
                     Date = t.Date,
                     Type = t.Type,
                     AccountingPercentage = t.AccountingPercentage, // ✅ Afegir
-                    CreatedAt = t.CreatedAt
+                    CreatedAt = t.CreatedAt,
+                    RecurringRuleId = t.RecurringRuleId
                 });
 
             return Ok(result);
@@ -77,6 +78,10 @@ namespace FinanceApp.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> Create([FromBody] CreateTransactionRequest request)
         {
+            var validation = TransactionValidator.Validate(request.Amount, request.Type, request.AccountingPercentage);
+            if (validation != null)
+                return BadRequest(new { error = validation });
+
             var category = await _categoriesDataStore.GetByIdAsync(request.CategoryId);
             if (category == null)
                 return BadRequest(new { error = "La categoria no existeix" });
@@ -106,6 +111,10 @@ namespace FinanceApp.API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Transaction>> Update(int id, [FromBody] UpdateTransactionRequest request)
         {
+            var validation = TransactionValidator.Validate(request.Amount, request.Type, request.AccountingPercentage);
+            if (validation != null)
+                return BadRequest(new { error = validation });
+
             var data = await _dataStore.GetDataAsync();
             var transaction = data.Transactions.FirstOrDefault(t => t.Id == id);
 
@@ -147,6 +156,20 @@ namespace FinanceApp.API.Controllers
         }
     }
 
+    public static class TransactionValidator
+    {
+        public static string? Validate(decimal amount, string type, int accountingPercentage)
+        {
+            if (amount <= 0)
+                return "L'import ha de ser positiu";
+            if (type != "income" && type != "expense")
+                return "El tipus ha de ser 'income' o 'expense'";
+            if (accountingPercentage < 1 || accountingPercentage > 100)
+                return "El percentatge ha d'estar entre 1 i 100";
+            return null;
+        }
+    }
+
     // DTO per retornar transacció amb categoria resolta
     public class TransactionDto
     {
@@ -160,6 +183,7 @@ namespace FinanceApp.API.Controllers
         public string Type { get; set; } = string.Empty;
         public int AccountingPercentage { get; set; } = 100; // ✅ Afegir
         public DateTime CreatedAt { get; set; }
+        public int? RecurringRuleId { get; set; }
     }
 
     // Request per crear transacció

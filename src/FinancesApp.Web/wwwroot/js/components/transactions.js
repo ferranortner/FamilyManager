@@ -1,6 +1,7 @@
 // components/transactions.js
 import { financeService } from '../services/financeService.js'
 import { categoryService } from '../services/categoryService.js'
+import { categoryOptionsHtml } from '../utils/categoryOptions.js'
 
 export class TransactionManager {
   constructor(containerId) {
@@ -81,7 +82,7 @@ export class TransactionManager {
               <label for="category-filter">Categoria</label>
               <select id="category-filter" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
                 <option value="all">Totes</option>
-                ${this.categories.map(c => `<option value="${c.id}" ${this.selectedCategory === String(c.id) ? 'selected' : ''}>${c.icon || '•'} ${c.name}</option>`).join('')}
+                ${categoryOptionsHtml(this.categories, c => this.selectedCategory === String(c.id))}
               </select>
             </div>
 

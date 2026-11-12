@@ -59,9 +59,6 @@ export const financeService = {
     })
   },
 
-  async getSummary(year, month) {
-    return apiService.request(`/transactions/summary?year=${year}&month=${month}`)
-  },
   async updateTransaction(id, data) {
     const payload = {
       accountId: parseInt(data.accountId) || 1,

@@ -299,16 +299,11 @@ export class Dashboard {
 
   async getTransactions(year, month) {
     try {
-      if (!this.financeService?.getTransactionsByMonth) {
-        console.warn('getTransactionsByMonth no disponible, provant getTransactions...')
-        const allTransactions = await this.financeService.getTransactions()
-        return allTransactions.filter(t => {
-          const date = new Date(t.date)
-          return date.getFullYear() === year && date.getMonth() + 1 === month
-        })
-      }
-
-      return await this.financeService.getTransactionsByMonth(year, month)
+      const allTransactions = await this.financeService.getTransactions()
+      return allTransactions.filter(t => {
+        const date = new Date(t.date)
+        return date.getFullYear() === year && date.getMonth() + 1 === month
+      })
     } catch (error) {
       console.error('Error obtenint transaccions:', error)
       return []

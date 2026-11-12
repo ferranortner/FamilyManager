@@ -1,4 +1,11 @@
 import { categoryService } from '../services/categoryService.js'
+import { API_URL } from '../services/apiService.js'
+import { escapeHtml, groupCategories } from '../utils/categoryOptions.js'
+
+// URL de la imatge servida per l'API (amb marca de temps per no reutilitzar la memòria cau)
+function categoryImageUrl(category) {
+  return `${API_URL}/categories/${category.id}/image?t=${Date.now()}`
+}
 
 export class CategoriesManager {
   constructor(containerId) {
@@ -44,6 +51,13 @@ export class CategoriesManager {
                 <label class="form-label" for="cat-color">Color identificatiu</label>
                 <input type="color" id="cat-color" class="form-control" value="#6b7280" style="height: 42px; padding: 4px;">
               </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cat-group">Grup (opcional)</label>
+              <input type="text" id="cat-group" class="form-control" list="cat-group-options" maxlength="40" placeholder="Ex: Casa, Vehicles, Salut...">
+              <datalist id="cat-group-options"></datalist>
+              <span class="form-text" style="font-size: 0.8rem; color: var(--text-muted);">Les categories amb el mateix grup es mostren juntes.</span>
             </div>
 
             <div class="form-group">
@@ -117,37 +131,8 @@ export class CategoriesManager {
       const expenseCats = this.categories.filter(c => c.type === 'expense')
 
       return `
-        ${
-          incomeCats.length > 0
-            ? `
-        <div class="category-section" style="margin-bottom: 32px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-            <i class="material-icons" style="color: var(--result-success-text);">trending_up</i>
-            <h4 style="margin: 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Ingressos</h4>
-          </div>
-          <div class="category-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
-            ${incomeCats.map(c => this.renderCategoryCard(c)).join('')}
-          </div>
-        </div>
-        `
-            : ''
-        }
-
-        ${
-          expenseCats.length > 0
-            ? `
-        <div class="category-section">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-            <i class="material-icons" style="color: var(--result-error-text);">trending_down</i>
-            <h4 style="margin: 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Despeses</h4>
-          </div>
-          <div class="category-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
-            ${expenseCats.map(c => this.renderCategoryCard(c)).join('')}
-          </div>
-        </div>
-        `
-            : ''
-        }
+        ${this.renderTypeSection('Ingressos', 'trending_up', 'var(--result-success-text)', incomeCats)}
+        ${this.renderTypeSection('Despeses', 'trending_down', 'var(--result-error-text)', expenseCats)}
       `
     } catch (error) {
       return `
@@ -160,10 +145,38 @@ export class CategoriesManager {
     }
   }
 
+  // Ordena les categories per grup: primer els grups amb nom, "Sense grup" al final
+  renderTypeSection(title, icon, iconColor, categories) {
+    if (categories.length === 0) return ''
+
+    const groups = groupCategories(categories)
+    return `
+      <div class="category-section" style="margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+          <i class="material-icons" style="color: ${iconColor};">${icon}</i>
+          <h4 style="margin: 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">${title}</h4>
+        </div>
+        ${groups
+          .map(
+            g => `
+          <div class="category-group" style="margin-bottom: 20px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">
+              ${escapeHtml(g.name)} <span style="font-weight: 400;">(${g.items.length})</span>
+            </div>
+            <div class="category-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+              ${g.items.map(c => this.renderCategoryCard(c)).join('')}
+            </div>
+          </div>`
+          )
+          .join('')}
+      </div>
+    `
+  }
+
   renderCategoryCard(category) {
-    const hasImage = category.imageUrl || category.imageData
+    const hasImage = !!category.imageFile
     const iconDisplay = hasImage
-      ? `<img src="${category.imageUrl || category.imageData}" alt="${category.name}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;">`
+      ? `<img src="${categoryImageUrl(category)}" alt="${escapeHtml(category.name)}" style="width: 28px; height: 28px; object-fit: contain; border-radius: 4px;">`
       : `<span style="font-size: 1.25rem;">${category.icon || '📁'}</span>`
 
     // Colors segons el tipus
@@ -398,14 +411,22 @@ export class CategoriesManager {
     this.removeImage()
     this.switchIconTab('emoji')
 
+    // Llista de grups existents per a l'autocompletat
+    const groupList = document.getElementById('cat-group-options')
+    if (groupList) {
+      const groups = [...new Set(this.categories.map(c => (c.group || '').trim()).filter(Boolean))]
+      groupList.innerHTML = groups.map(g => `<option value="${escapeHtml(g)}">`).join('')
+    }
+
     if (category) {
       document.getElementById('cat-name').value = category.name
       document.getElementById('cat-type').value = category.type
       document.getElementById('cat-color').value = category.color || '#6b7280'
+      document.getElementById('cat-group').value = category.group || ''
 
-      if (category.imageUrl || category.imageData) {
+      if (category.imageFile) {
         this.switchIconTab('image')
-        this.selectedImage = category.imageUrl || category.imageData
+        this.selectedImage = categoryImageUrl(category)
         this.showImagePreview(this.selectedImage)
       } else {
         document.getElementById('cat-icon').value = category.icon || ''
@@ -430,26 +451,35 @@ export class CategoriesManager {
     e.preventDefault()
 
     const activeTab = document.querySelector('.icon-tab.active')?.dataset.tab
+    const group = document.getElementById('cat-group').value.trim()
 
     const category = {
       name: document.getElementById('cat-name').value.trim(),
       type: document.getElementById('cat-type').value,
       color: document.getElementById('cat-color').value,
+      group: group || null,
+      icon: activeTab === 'image' ? null : document.getElementById('cat-icon').value.trim(),
     }
 
-    if (activeTab === 'image' && this.selectedImage) {
-      category.imageData = this.selectedImage
-      category.icon = null
-    } else {
-      category.icon = document.getElementById('cat-icon').value.trim()
-      category.imageData = null
-    }
+    // Imatge nova (data URL) → es puja a la carpeta; si és una URL existent, no cal fer res
+    const newImage = activeTab === 'image' && this.selectedImage?.startsWith('data:') ? this.selectedImage : null
+    const removeImage = activeTab !== 'image' || !this.selectedImage
+    const existing = this.editingId ? this.categories.find(c => c.id === this.editingId) : null
 
     try {
-      if (this.editingId) {
-        await categoryService.update(this.editingId, category)
+      let id = this.editingId
+      if (id) {
+        // El backend exigeix que l'id del cos coincideixi amb el de la URL
+        await categoryService.update(id, { ...category, id })
       } else {
-        await categoryService.create(category)
+        const created = await categoryService.create(category)
+        id = created.id
+      }
+
+      if (newImage) {
+        await categoryService.uploadImage(id, newImage)
+      } else if (removeImage && existing?.imageFile) {
+        await categoryService.deleteImage(id)
       }
 
       this.hideForm()
